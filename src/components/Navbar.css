@@ -1,0 +1,57 @@
+.navbar {
+  width: 100%;
+  background: #fff8f0;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo */
+.logo img {
+  width: 200px;
+  height: 200px;
+}
+
+/* Right side group */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem; /* space between links & button */
+}
+
+/* Links */
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #1e1e21;
+  font-weight: 500;
+  font-family: Poppins,sans-serif;
+}
+
+/* Button */
+.nav-btn {
+  background: #92140c;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.4rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.nav-btn:hover {
+  background: #b91c1c;
+}
