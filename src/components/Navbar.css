@@ -13,11 +13,7 @@
   justify-content: space-between;
 }
 
-/* Logo */
-.logo img {
-  width: 200px;
-  height: 200px;
-}
+
 
 /* Right side group */
 .nav-right {
@@ -38,6 +34,7 @@
   color: #1e1e21;
   font-weight: 500;
   font-family: Poppins,sans-serif;
+  font-size: large;
 }
 
 /* Button */
@@ -45,7 +42,8 @@
   background: #92140c;
   color: #fff;
   border: none;
-  padding: 0.6rem 1.4rem;
+  padding: 0.5rem 1.4rem;
+  margin-bottom: 5px;
   border-radius: 8px;
   font-size: 0.9rem;
   cursor: pointer;
