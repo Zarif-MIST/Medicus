@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import "./Navbar.css";
 
 
@@ -20,10 +21,10 @@ function Navbar() {
         {/* Right: Links + Button (GROUPED) */}
         <div className="nav-right">
           <ul className="nav-links">
-            <li><a href="#features">Features</a></li>
-            <li><a href="#doctors">Doctors</a></li>
-            <li><a href="#pharmacy">Pharmacy</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li><Link to="/">Features</Link></li>
+            <li><Link to="/">Doctors</Link></li>
+            <li><Link to="/">Pharmacy</Link></li>
+            <li><Link to="/">Contact</Link></li>
           </ul>
 
           <button className="nav-btn">Login</button>

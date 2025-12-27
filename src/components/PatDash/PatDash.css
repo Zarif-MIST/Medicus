@@ -1,0 +1,225 @@
+/* src/components/PatientDashboard.css */
+
+.dashboard {
+  max-width: 1400px;
+  margin: 40px auto;
+  padding: 0 30px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background-color: #f9f5f5;
+  min-height: 100vh;
+}
+
+/* Summary Cards */
+.summary-cards {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  flex: 1;
+  min-width: 220px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.summary-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 16px;
+  background: #991b1b;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.summary-icon.heart {
+  background: #000;
+}
+
+.summary-label {
+  color: #666;
+  font-size: 16px;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.tab {
+  padding: 12px 28px;
+  border: none;
+  border-radius: 50px;
+  background: #f0f0f0;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.tab.active {
+  background: #991b1b;
+  color: white;
+}
+
+/* Main Grid */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.section-card {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.section-card.large {
+  grid-row: span 2;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.section-header h3 {
+  font-size: 22px;
+  margin: 0;
+}
+
+.view-all {
+  color: #991b1b;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Active Prescription */
+.prescription-name {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.prescription-doctor {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.prescription-details {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  color: #444;
+}
+
+.prescription-instructions {
+  color: #666;
+  margin-bottom: 24px;
+  font-style: italic;
+}
+
+.qr-button {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 12px 24px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Vital Signs */
+.vital-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.vital-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 18px;
+}
+
+.vital-item strong {
+  font-size: 20px;
+}
+
+/* Medical History */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.date {
+  color: #999;
+  font-size: 15px;
+}
+
+/* Health Tips */
+.tips-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tips-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 16px;
+}
+
+.tips-list li:last-child {
+  border-bottom: none;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-card.large {
+    grid-row: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .summary-cards {
+    flex-direction: column;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+  }
+
+  .dashboard {
+    padding: 0 20px;
+  }
+}

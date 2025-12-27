@@ -1,7 +1,9 @@
 // src/components/RoleSection.jsx or .tsx
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function RoleSection() {
+  const navigate = useNavigate();
   const roles = [
     {
       title: 'Doctors',
@@ -79,9 +81,13 @@ export default function RoleSection() {
                 </p>
 
                 {/* Button */}
-                <button className="w-3/4 mx-auto py-3 px-6 bg-white text-gray-900 font-medium rounded-full hover:bg-gray-100 hover:shadow-lg transition-all duration-300">
-                  Start
-                </button>
+                  <button 
+                    onClick={() => navigate('/register')}
+                    className="w-3/4 mx-auto py-3 px-6 bg-white text-gray-900 font-medium rounded-full hover:bg-gray-100 hover:shadow-lg transition-all duration-300"
+                  >
+                    Start
+                 
+                  </button>
               </div>
 
               {/* Bottom accent line */}

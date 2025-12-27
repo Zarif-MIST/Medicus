@@ -1,24 +1,25 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HomePage/HeroSection";
 import RoleSection from "./components/HomePage/RoleSection";
 import FeaturesSection from "./components/HomePage/FeaturesSection";
-import WhatWeDoSection from "./components/HomePage/WhatWeDoSection";
+import RegisterSection from "./components/PatReg/PatRegistration";
+import PatientDashboard from "./components/PatDash/PatDash";
+import PatientPrescriptionsDashboard from "./components/PatDash/PatDashPres";
+import PatientMedicalRecordsDashboard from "./components/PatDash/PatDashMed";
 
 function App() {
   return (
-    <>
+    <Router>
       <Navbar />
-      <HeroSection />
-      <RoleSection />
-      <FeaturesSection />
-      <WhatWeDoSection /> 
-      <main>
-        <h1>Welcome to Medicus</h1>
-          <h1 className="text-3xl font-bold underline text-blue-600">
-      Hello world!
-    </h1>
-      </main>
-    </>
+      <Routes>
+        <Route path="/" element={<><HeroSection /><RoleSection /><FeaturesSection /></>} />
+        <Route path="/register" element={<RegisterSection />} />
+        <Route path="/dashboard" element={<PatientDashboard />} />
+        <Route path="/prescriptions" element={<PatientPrescriptionsDashboard />} />
+        <Route path="/medical-records" element={<PatientMedicalRecordsDashboard />} />
+      </Routes>
+    </Router>
   );
 }
 
