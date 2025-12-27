@@ -1,0 +1,155 @@
+/* App.css */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9f9fb;
+  color: #333;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px dashed #ddd;
+  margin-bottom: 40px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.logo-icon {
+  margin-right: 10px;
+  font-size: 32px;
+}
+
+.logo-text {
+  color: #c00;
+}
+
+.nav a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #555;
+  font-weight: 500;
+}
+
+.login-btn {
+  margin-left: 30px;
+  padding: 8px 20px;
+  background-color: #c00;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.login-btn:hover {
+  background-color: #a00;
+}
+
+.main-content {
+  display: flex;
+  gap: 60px;
+  align-items: flex-start;
+}
+
+.left-panel {
+  flex: 1;
+  background-color: #92140c;
+  color: white;
+  padding: 50px 40px;
+  border-radius: 12px;
+  min-width: 400px;
+}
+
+.pill-icon {
+  font-size: 80px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.left-panel h2 {
+  font-size: 24px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.benefits {
+  list-style: none;
+}
+
+.benefits li {
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+.right-panel {
+  flex: 1;
+  background-color: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.register-form input[type="text"],
+.register-form input[type="email"],
+.register-form input[type="tel"],
+.register-form input[type="date"],
+.register-form input[type="password"] {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.register-form input::placeholder {
+  color: #aaa;
+}
+
+.terms {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.terms input {
+  margin-right: 10px;
+}
+
+.register-btn {
+  width: 100%;
+  padding: 16px;
+  background-color: #c00;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.register-btn:hover {
+  background-color: #a00;
+}
