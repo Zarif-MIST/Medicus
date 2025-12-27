@@ -1,0 +1,100 @@
+/* src/components/FeaturesSection.css */
+
+.features-section {
+  padding: 100px 20px;
+  background-color: #fff5f5;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+}
+
+.features-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.features-title {
+  font-size: 42px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 100px;
+}
+
+.features-title .highlight {
+  color: #9f1239; /* Deep red to match the cards */
+}
+
+.features-grid {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.feature-card {
+  background-color: #991b1b; /* Dark red matching the design */
+  color: white;
+  width: 300px;
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 20px rgba(153, 27, 27, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 30px rgba(153, 27, 27, 0.3);
+}
+
+.feature-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 30px;
+  color: white;
+}
+
+.feature-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.feature-card-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.feature-description {
+  font-size: 16px;
+  line-height: 1.5;
+  opacity: 0.95;
+}
+
+/* Responsive adjustments */
+@media (max-width: 968px) {
+  .features-grid {
+    gap: 30px;
+  }
+  
+  .feature-card {
+    width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .features-title {
+    font-size: 36px;
+    margin-bottom: 80px;
+  }
+  
+  .features-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .feature-card {
+    width: 90%;
+    max-width: 320px;
+  }
+}

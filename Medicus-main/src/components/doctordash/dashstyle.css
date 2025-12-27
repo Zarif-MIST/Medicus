@@ -1,0 +1,225 @@
+.dash-root {
+  min-height: 100vh;
+  background: #fff8f0; /* same family as your navbar */
+  font-family: Poppins, system-ui, sans-serif;
+}
+
+.dash-main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 32px 24px 72px;
+}
+
+/* HERO BANNER */
+
+.dash-hero {
+  background: #15151f;
+  color: #f9fafb;
+  border-radius: 18px;
+  padding: 28px 40px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 28px;
+}
+
+.dash-hero-icon {
+  width: 86px;
+  height: 86px;
+  border-radius: 999px;
+  background: rgba(249, 250, 251, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stetho-ring {
+  width: 48px;
+  height: 48px;
+  border-radius: 28px;
+  border: 4px solid #fef2f2;
+  position: relative;
+}
+
+.stetho-tip {
+  position: absolute;
+  right: -7px;
+  bottom: -2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 4px solid #fef2f2;
+}
+
+.dash-hero-text h1 {
+  margin: 0 0 6px;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.dash-hero-text p {
+  margin: 0;
+  font-size: 15px;
+  color: #e5e7eb;
+}
+
+/* ACTION BUTTONS */
+
+.dash-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+}
+
+.dash-action-card {
+  flex: 1 1 0;
+  min-width: 240px;
+  border: none;
+  border-radius: 12px;
+  padding: 18px 24px;
+  background: #b32816;
+  color: #fef2f2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  box-shadow: 0 14px 26px rgba(179, 40, 22, 0.4);
+  transition: transform 0.08s ease, box-shadow 0.08s ease,
+    background 0.08s ease;
+}
+
+.dash-action-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 30px rgba(179, 40, 22, 0.5);
+  background: #9a2212;
+}
+
+.action-icon {
+  font-size: 22px;
+}
+
+/* PATIENT LOOKUP */
+
+.lookup-section {
+  margin-top: 10px;
+}
+
+.lookup-header {
+  margin-bottom: 16px;
+}
+
+.lookup-title-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.lookup-big-icon {
+  font-size: 30px;
+}
+
+.lookup-title-row h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.lookup-title-row p {
+  margin: 4px 0 0;
+  font-size: 15px;
+  color: #4b5563;
+}
+
+.lookup-form {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  max-width: 100%;
+}
+
+.lookup-input {
+  flex: 1;
+  padding: 16px 18px;
+  font-size: 15px;
+  border-radius: 999px;
+  border: 2px solid #f3d5c4;
+  background: #fffdf9;
+  outline: none;
+  box-shadow: 0 6px 0 #f3b9a0;
+}
+
+.lookup-input::placeholder {
+  color: #c4c4c7;
+}
+
+.lookup-input:focus {
+  border-color: #b32816;
+  box-shadow: 0 0 0 3px rgba(179, 40, 22, 0.22);
+}
+
+.lookup-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 32px;
+  border-radius: 999px;
+  border: none;
+  background: #b32816;
+  color: #fef2f2;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 12px 22px rgba(179, 40, 22, 0.45);
+  white-space: nowrap;
+}
+
+.lookup-button:hover {
+  background: #9a2212;
+}
+
+.lookup-btn-icon {
+  font-size: 20px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+  .dash-main {
+    padding: 24px 16px 56px;
+  }
+
+  .dash-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dash-actions {
+    flex-direction: column;
+  }
+
+  .lookup-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .lookup-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 520px) {
+  .dash-hero-text h1 {
+    font-size: 26px;
+  }
+
+  .dash-hero {
+    padding: 22px 20px;
+  }
+}
