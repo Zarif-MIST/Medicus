@@ -131,8 +131,7 @@
 }
 
 .quick-row {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  display: flex;
   gap: 12px;
   margin-top: 12px;
 }
@@ -157,24 +156,6 @@
   border-radius: 8px;
   background: #ffffff22;
   border: 1px solid #ffffff55;
-}
-
-.search-box {
-  background: #111827;
-  color: #ffffff;
-  border-radius: 12px;
-  padding: 12px 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.search-box input {
-  border: none;
-  background: transparent;
-  color: #ffffff;
-  width: 100%;
-  outline: none;
 }
 
 .alerts-card .alert-item {

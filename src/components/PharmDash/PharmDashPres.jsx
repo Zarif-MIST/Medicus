@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './PharmDashPres.css';
+import { prescriptionsData } from './prescriptionsData';
 
 export default function PharmDashPres() {
   const navigate = useNavigate();
   const [inventory, setInventory] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedRx, setSelectedRx] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     try {
@@ -72,43 +76,19 @@ export default function PharmDashPres() {
     },
   ];
 
-  const prescriptions = [
-    {
-      id: 'RX001',
-      patient: 'Patient: x',
-      doctor: 'Doctor: Dr. alfred',
-      medication: 'Amoxicillin 500mg - 30 tablets',
-      status: 'Processed',
-    },
-    {
-      id: 'RX002',
-      patient: 'Patient: y',
-      doctor: 'Doctor: Dr. alfred',
-      medication: 'Ibuprofen 400mg - 20 tablets',
-      status: 'Processed',
-    },
-    {
-      id: 'RX003',
-      patient: 'Patient: n',
-      doctor: 'Doctor: Dr. alfred',
-      medication: 'Lisinopril 10mg - 60 tablets',
-      status: 'Processed',
-    },
-    {
-      id: 'RX004',
-      patient: 'Patient: m',
-      doctor: 'Doctor: Dr. smith',
-      medication: 'Metformin 500mg - 90 tablets',
-      status: 'Pending',
-    },
-    {
-      id: 'RX005',
-      patient: 'Patient: z',
-      doctor: 'Doctor: Dr. jones',
-      medication: 'Atorvastatin 20mg - 30 tablets',
-      status: 'Processed',
-    },
-  ];
+  const [prescriptions, setPrescriptions] = useState(prescriptionsData);
+
+  const handleOpenPrescription = (rx) => {
+    setSelectedRx({ ...rx });
+    setShowModal(true);
+  };
+
+  // View-only modal; editing disabled per request
+
+  const normalizedQuery = searchTerm.trim().toLowerCase();
+  const filteredPrescriptions = normalizedQuery
+    ? prescriptions.filter((rx) => rx.patientId.toLowerCase().includes(normalizedQuery))
+    : prescriptions;
 
   return (
     <section className="pharm-page">
@@ -143,7 +123,12 @@ export default function PharmDashPres() {
               <h3>All Prescriptions</h3>
               <div className="pres-controls">
                 <div className="search-control">
-                  <input type="text" placeholder="Search prescriptions..." />
+                  <input
+                    type="text"
+                    placeholder="Search by Patient ID..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="11" cy="11" r="7" />
                     <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -167,23 +152,96 @@ export default function PharmDashPres() {
             </div>
 
             <div className="prescriptions-list">
-              {prescriptions.map((rx) => (
+              {filteredPrescriptions.map((rx) => (
                 <div key={rx.id} className="prescription-item">
                   <div className="pres-info">
                     <div className="pres-id">{rx.id}</div>
-                    <div className="pres-patient">{rx.patient}</div>
-                    <div className="pres-doctor">{rx.doctor}</div>
-                    <div className="pres-medication">{rx.medication}</div>
+                    <div className="pres-patient">Patient: {rx.patientName}</div>
+                    <div className="pres-doctor">Doctor: {rx.doctor}</div>
+                    <div className="pres-medication">{rx.medications.split('\n')[0]}</div>
                   </div>
-                  <button className={`pres-status-btn ${rx.status.toLowerCase()}`}>
-                    {rx.status}
-                  </button>
+                  <div className="pres-actions">
+                    <button className={`pres-status-btn ${rx.status.toLowerCase()}`}>
+                      {rx.status}
+                    </button>
+                    <button className="view-btn" onClick={() => handleOpenPrescription(rx)}>
+                      View
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </div>
+
+      {showModal && selectedRx && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="modal-content wide" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <h2>{selectedRx.patientName}</h2>
+                <p className="muted">Patient ID: {selectedRx.patientId}</p>
+              </div>
+              <button className="modal-close" onClick={() => setShowModal(false)}>×</button>
+            </div>
+
+              <div className="modal-body">
+              <div className="summary-grid">
+                <div className="pill-card">Age<span>{selectedRx.age}</span></div>
+                <div className="pill-card">Gender<span>{selectedRx.gender}</span></div>
+                <div className="pill-card">Blood Type<span>{selectedRx.bloodType}</span></div>
+                <div className="pill-card">Prescriptions<span>{selectedRx.prescriptionsCount}</span></div>
+              </div>
+
+              <div className="field-grid">
+                <div className="field">
+                  <label>Patient Name</label>
+                    <input value={selectedRx.patientName} readOnly />
+                </div>
+                <div className="field">
+                  <label>Patient ID</label>
+                    <input value={selectedRx.patientId} readOnly />
+                </div>
+                <div className="field">
+                  <label>Doctor</label>
+                    <input value={selectedRx.doctor} readOnly />
+                </div>
+                <div className="field">
+                  <label>Status</label>
+                    <input value={selectedRx.status} readOnly />
+                </div>
+              </div>
+
+              <div className="field-grid">
+                <div className="field">
+                  <label>Allergies</label>
+                    <input value={selectedRx.allergies} readOnly />
+                </div>
+                <div className="field">
+                  <label>Current Conditions</label>
+                    <input value={selectedRx.conditions} readOnly />
+                </div>
+              </div>
+
+              <div className="field">
+                <label>Diagnosis</label>
+                  <textarea rows="3" value={selectedRx.diagnosis} readOnly />
+              </div>
+
+              <div className="field">
+                <label>Prescription</label>
+                  <textarea rows="4" value={selectedRx.medications} readOnly />
+              </div>
+
+              <div className="modal-actions">
+                <button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="button" className="btn-submit">Dispense</button>
+              </div>
+              </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
