@@ -1,9 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './PharmDashPres.css';
 
 export default function PharmDashPres() {
   const navigate = useNavigate();
+  const [inventory, setInventory] = useState([]);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('pharmacyInventory');
+      const parsed = stored ? JSON.parse(stored) : [];
+      if (Array.isArray(parsed)) setInventory(parsed);
+    } catch (err) {
+      // ignore parse errors
+    }
+  }, []);
+
+  const totalMedicines = inventory.length;
+  const lowStockCount = inventory.filter((item) => item.status === 'Low Stock').length;
+  const expiringCount = inventory.filter((item) => item.status === 'Expiring Soon').length;
 
   const stats = [
     {
@@ -20,7 +35,7 @@ export default function PharmDashPres() {
     },
     {
       label: 'Medicines',
-      value: '342',
+      value: String(totalMedicines),
       status: 'Total',
       tone: 'dark',
       icon: (
@@ -32,7 +47,7 @@ export default function PharmDashPres() {
     },
     {
       label: 'Low Stock',
-      value: '8',
+      value: String(lowStockCount),
       status: 'Alert',
       tone: 'warning',
       icon: (
@@ -45,7 +60,7 @@ export default function PharmDashPres() {
     },
     {
       label: 'Expiring Soon',
-      value: '5',
+      value: String(expiringCount),
       status: 'Warning',
       tone: 'alert',
       icon: (
@@ -135,7 +150,17 @@ export default function PharmDashPres() {
                   </svg>
                 </div>
                 <button className="scan-btn">
-                  <span className="icon-dot" />
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="5" height="5" rx="1" />
+                    <rect x="10" y="3" width="5" height="5" rx="1" />
+                    <rect x="3" y="10" width="5" height="5" rx="1" />
+                    <path d="M10 10h3v3h-3z" />
+                    <path d="M13 13h2v2h-2z" />
+                    <path d="M15 15h3v3h-3z" />
+                    <path d="M12 16h3" />
+                    <path d="M16 12h2" />
+                    <path d="M12 12h1" />
+                  </svg>
                   Scan
                 </button>
               </div>
