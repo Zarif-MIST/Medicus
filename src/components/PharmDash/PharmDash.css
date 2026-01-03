@@ -1,0 +1,272 @@
+.pharm-page {
+  background: #fdf5ee;
+  min-height: 100vh;
+  padding: 40px 24px 64px;
+  display: flex;
+  justify-content: center;
+}
+
+.pharm-layout {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pharm-header h1 {
+  font-size: 22px;
+  color: #1f2937;
+  margin: 0;
+}
+
+.pharm-header p {
+  margin: 4px 0 0;
+  color: #6b7280;
+}
+
+.pharm-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.pharm-card {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+  padding: 18px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+}
+
+.stat-meta {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.stat-label {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.stat-status {
+  color: #9ca3af;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.stat-card.accent .stat-icon {
+  background: #9817171a;
+  color: #9b1c1c;
+}
+
+.stat-card.dark .stat-icon {
+  background: #1118270f;
+  color: #111827;
+}
+
+.stat-card.warning .stat-icon {
+  background: #f59e0b1a;
+  color: #d97706;
+}
+
+.stat-card.alert .stat-icon {
+  background: #ef44441a;
+  color: #dc2626;
+}
+
+.pharm-tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.tab {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  background: #ffffff;
+  color: #111827;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  transform: translateY(-1px);
+}
+
+.tab.active {
+  background: #9b1c1c;
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(155, 28, 28, 0.25);
+}
+
+.pharm-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 14px;
+}
+
+.quick-card {
+  grid-column: span 2;
+}
+
+.quick-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.scan-btn {
+  background: #9b1c1c;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 10px 24px rgba(155, 28, 28, 0.25);
+}
+
+.icon-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #ffffff22;
+  border: 1px solid #ffffff55;
+}
+
+.search-box {
+  background: #111827;
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-box input {
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  width: 100%;
+  outline: none;
+}
+
+.alerts-card .alert-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.alert-red {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.alert-yellow {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.alert-title {
+  font-weight: 700;
+}
+
+.alert-sub {
+  font-size: 12px;
+  color: inherit;
+  opacity: 0.9;
+}
+
+.activity-card ul,
+.summary-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+}
+
+.activity-card li {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.activity-card li:last-child {
+  border-bottom: none;
+}
+
+.bullet {
+  width: 10px;
+  height: 10px;
+  background: #9b1c1c;
+  border-radius: 50%;
+  margin-top: 6px;
+}
+
+.activity-title {
+  font-weight: 700;
+}
+
+.activity-sub {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.summary-card li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.summary-card li:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 1024px) {
+  .pharm-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-card {
+    grid-column: span 1;
+  }
+
+  .quick-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .pharm-stats {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+}

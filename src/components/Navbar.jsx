@@ -23,11 +23,12 @@ function Navbar() {
           <ul className="nav-links">
             <li><Link to="/">Features</Link></li>
             <li><Link to="/">Doctors</Link></li>
+            <li><Link to="/">Patients</Link></li>
             <li><Link to="/">Pharmacy</Link></li>
             <li><Link to="/">Contact</Link></li>
           </ul>
 
-          <button className="nav-btn">Login</button>
+          <button className="nav-btn">Logout</button>
         </div>
 
       </div>

@@ -58,42 +58,46 @@ export default function RoleSection() {
 
         {/* Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {roles.map((role, index) => (
-            <div
-              key={index}
-              className="group relative bg-gray-900 rounded-2xl shadow-xl overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl"
-            >
-              {/* Hover overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-red-600/20 to-red-800/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          {roles.map((role, index) => {
+            const targetPath = role.title === 'Pharmacy' ? '/pharmacist-register' : '/register';
 
-              <div className="relative p-10 text-center text-white">
-                {/* Icon */}
-                <div className="mb-8 flex justify-center">
-                  <div className="p-8 rounded-full shadow-lg group-hover:shadow-2xl group-hover:scale-110 transition-all duration-300">
-                    {role.svg}
+            return (
+              <div
+                key={index}
+                className="group relative bg-gray-900 rounded-2xl shadow-xl overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl"
+              >
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-red-600/20 to-red-800/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                <div className="relative p-10 text-center text-white">
+                  {/* Icon */}
+                  <div className="mb-8 flex justify-center">
+                    <div className="p-8 rounded-full shadow-lg group-hover:shadow-2xl group-hover:scale-110 transition-all duration-300">
+                      {role.svg}
+                    </div>
                   </div>
+
+                  {/* Title & Description */}
+                  <h3 className="text-3xl font-bold mb-4">{role.title}</h3>
+                  <p className="text-gray-300 text-sm leading-relaxed mb-10">
+                    {role.description}
+                  </p>
+
+                  {/* Button */}
+                    <button 
+                      onClick={() => navigate(targetPath)}
+                      className="w-3/4 mx-auto py-3 px-6 bg-white text-gray-900 font-medium rounded-full hover:bg-gray-100 hover:shadow-lg transition-all duration-300"
+                    >
+                      Start
+                   
+                    </button>
                 </div>
 
-                {/* Title & Description */}
-                <h3 className="text-3xl font-bold mb-4">{role.title}</h3>
-                <p className="text-gray-300 text-sm leading-relaxed mb-10">
-                  {role.description}
-                </p>
-
-                {/* Button */}
-                  <button 
-                    onClick={() => navigate('/register')}
-                    className="w-3/4 mx-auto py-3 px-6 bg-white text-gray-900 font-medium rounded-full hover:bg-gray-100 hover:shadow-lg transition-all duration-300"
-                  >
-                    Start
-                 
-                  </button>
+                {/* Bottom accent line */}
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-800 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
               </div>
-
-              {/* Bottom accent line */}
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-800 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
