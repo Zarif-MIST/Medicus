@@ -1,0 +1,266 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 24px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 32px;
+  max-width: 900px;
+  width: 100%;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Patient card section */
+.modal-patient-card {
+  background: #fef9f3;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 1px solid #f3e5d7;
+}
+
+.modal-patient-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.modal-patient-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-avatar-icon {
+  font-size: 28px;
+}
+
+.modal-patient-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.modal-patient-meta {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.modal-patient-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.modal-stat-card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.modal-stat-label {
+  margin: 0 0 4px;
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.modal-stat-value {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.modal-patient-extra {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 13px;
+}
+
+.modal-extra-label {
+  margin: 0 0 2px;
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.modal-extra-value {
+  margin: 0;
+  color: #111827;
+  font-size: 13px;
+}
+
+/* Diagnosis and Prescription sections */
+.modal-section {
+  margin-bottom: 20px;
+}
+
+.modal-section-title {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.modal-diagnosis-content {
+  background: #fdfaf6;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px 16px;
+  min-height: 60px;
+}
+
+.modal-diagnosis-line {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.modal-diagnosis-line:first-child {
+  margin-top: 0;
+}
+
+.modal-diagnosis-line:last-child {
+  margin-bottom: 0;
+}
+
+.modal-medicines-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-medicine-item {
+  background: #fdfaf6;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.modal-medicine-name {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.modal-medicine-details {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.modal-no-medicines {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 13px;
+  padding: 16px;
+  background: #fdfaf6;
+  border-radius: 10px;
+  margin: 0;
+}
+
+/* Action buttons */
+.modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.modal-cancel-btn {
+  padding: 14px 20px;
+  background: #ffffff;
+  color: #111827;
+  border: 2px solid #d1d5db;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-cancel-btn:hover {
+  border-color: #9ca3af;
+  background: #f9fafb;
+}
+
+.modal-confirm-btn {
+  padding: 14px 20px;
+  background: #b32816;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(179, 40, 22, 0.3);
+}
+
+.modal-confirm-btn:hover {
+  background: #9a2212;
+  box-shadow: 0 6px 16px rgba(179, 40, 22, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 20px 16px;
+  }
+
+  .modal-content {
+    padding: 24px;
+  }
+
+  .modal-patient-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .modal-patient-extra {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .modal-actions {
+    grid-template-columns: 1fr;
+  }
+}
