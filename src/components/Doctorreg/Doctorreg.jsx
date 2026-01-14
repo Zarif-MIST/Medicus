@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { registerDoctor } from "../../services/api";
 import "./Doctorstyle.css";
 
 export default function RegistrationPage() {
   const navigate = useNavigate();
 
   const [agreed, setAgreed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -22,25 +26,52 @@ export default function RegistrationPage() {
       ...prev,
       [name]: value,
     }));
+    setError(""); // Clear error when user types
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
+    // Validations
     if (!agreed) {
-      alert("Please agree to the terms and conditions");
+      setError("Please agree to the terms and conditions");
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Password and Confirm Password must match");
+      setError("Password and Confirm Password must match");
       return;
     }
 
-    console.log({ ...formData, agreed });
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
 
-    // ✅ Route to doctor login page
-    navigate("/login/doctor");
+    setLoading(true);
+
+    try {
+      // Call API to register doctor in MongoDB
+      const result = await registerDoctor({
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        dob: formData.dob,
+        license: formData.license,
+        password: formData.password,
+      });
+
+      console.log("Registration successful:", result);
+
+      // Navigate to doctor dashboard
+      navigate("/doctordash");
+    } catch (err) {
+      setError(err.message || "Registration failed. Please try again.");
+      console.error("Registration error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -87,35 +118,130 @@ export default function RegistrationPage() {
           {/* Right Panel - Form */}
           <div className="registration-right-panel">
             <form className="registration-form" onSubmit={handleSubmit}>
-              <input type="text" name="fullName" placeholder="Full name" className="registration-input"
-                value={formData.fullName} onChange={handleChange} required />
+              {error && (
+                <div style={{
+                  padding: '12px',
+                  marginBottom: '15px',
+                  backgroundColor: '#fee',
+                  border: '1px solid #fcc',
+                  borderRadius: '6px',
+                  color: '#c33',
+                  fontSize: '14px'
+                }}>
+                  {error}
+                </div>
+              )}
 
-              <input type="email" name="email" placeholder="Email" className="registration-input"
-                value={formData.email} onChange={handleChange} required />
+              <input 
+                type="text" 
+                name="fullName" 
+                placeholder="Full name" 
+                className="registration-input"
+                value={formData.fullName} 
+                onChange={handleChange} 
+                required 
+                disabled={loading}
+              />
 
-              <input type="tel" name="phone" placeholder="Phone number" className="registration-input"
-                value={formData.phone} onChange={handleChange} required />
+              <input 
+                type="email" 
+                name="email" 
+                placeholder="Email" 
+                className="registration-input"
+                value={formData.email} 
+                onChange={handleChange} 
+                required 
+                disabled={loading}
+              />
 
-              <input type="text" name="dob" placeholder="Date of birth" className="registration-input"
-                value={formData.dob} onChange={handleChange} required />
+              <input 
+                type="tel" 
+                name="phone" 
+                placeholder="Phone number (10 digits)" 
+                className="registration-input"
+                value={formData.phone} 
+                onChange={handleChange} 
+                required 
+                disabled={loading}
+                pattern="[0-9]{10}"
+                title="Please enter a 10-digit phone number"
+              />
 
-              <input type="text" name="license" placeholder="BMDC License Number" className="registration-input"
-                value={formData.license} onChange={handleChange} required />
+              <input 
+                type="date" 
+                name="dob" 
+                placeholder="Date of birth" 
+                className="registration-input"
+                value={formData.dob} 
+                onChange={handleChange} 
+                required 
+                disabled={loading}
+              />
 
-              <input type="password" name="password" placeholder="Password" className="registration-input"
-                value={formData.password} onChange={handleChange} required />
+              <input 
+                type="text" 
+                name="license" 
+                placeholder="Medical License Number" 
+                className="registration-input"
+                value={formData.license} 
+                onChange={handleChange} 
+                required 
+                disabled={loading}
+              />
 
-              <input type="password" name="confirmPassword" placeholder="Confirm Password" className="registration-input"
-                value={formData.confirmPassword} onChange={handleChange} required />
+              <input 
+                type="password" 
+                name="password" 
+                placeholder="Password (min 6 characters)" 
+                className="registration-input"
+                value={formData.password} 
+                onChange={handleChange} 
+                required 
+                disabled={loading}
+                minLength="6"
+              />
+
+              <input 
+                type="password" 
+                name="confirmPassword" 
+                placeholder="Confirm Password" 
+                className="registration-input"
+                value={formData.confirmPassword} 
+                onChange={handleChange} 
+                required 
+                disabled={loading}
+              />
 
               <div className="registration-checkbox">
-                <input id="terms" type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
+                <input 
+                  id="terms" 
+                  type="checkbox" 
+                  checked={agreed} 
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  disabled={loading}
+                />
                 <label htmlFor="terms">
                   I agree to the <strong>Terms of Service</strong> and <strong>Privacy Policy</strong>
                 </label>
               </div>
 
-              <button type="submit" className="registration-submit-btn">Register</button>
+              <button 
+                type="submit" 
+                className="registration-submit-btn"
+                disabled={loading}
+                style={{ opacity: loading ? 0.7 : 1 }}
+              >
+                {loading ? 'Registering...' : 'Register'}
+              </button>
+
+              <div className="registration-login-link">
+                <p>
+                  Already have an account?{" "}
+                  <span onClick={() => navigate("/doctorlogin")} style={{ color: "#92140C", cursor: "pointer", fontWeight: "bold" }}>
+                    Login here
+                  </span>
+                </p>
+              </div>
             </form>
           </div>
         </div>

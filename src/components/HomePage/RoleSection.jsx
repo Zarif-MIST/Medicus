@@ -1,7 +1,22 @@
 // src/components/RoleSection.jsx or .tsx
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function RoleSection() {
+  const navigate = useNavigate();
+
+  const handleRoleClick = (roleTitle) => {
+    if (roleTitle === 'Doctors') {
+      navigate('/doctorreg');
+    } else if (roleTitle === 'Pharmacy') {
+      // Add pharmacy route when available
+      console.log('Pharmacy registration coming soon');
+    } else if (roleTitle === 'Patient') {
+      // Add patient route when available
+      console.log('Patient registration coming soon');
+    }
+  };
+
   const roles = [
     {
       title: 'Doctors',
@@ -79,7 +94,10 @@ export default function RoleSection() {
                 </p>
 
                 {/* Button */}
-                <button className="w-3/4 mx-auto py-3 px-6 bg-white text-gray-900 font-medium rounded-full hover:bg-gray-100 hover:shadow-lg transition-all duration-300">
+                <button 
+                  onClick={() => handleRoleClick(role.title)}
+                  className="w-3/4 mx-auto py-3 px-6 bg-white text-gray-900 font-medium rounded-full hover:bg-gray-100 hover:shadow-lg transition-all duration-300"
+                >
                   Start
                 </button>
               </div>

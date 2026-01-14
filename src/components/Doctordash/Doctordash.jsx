@@ -10,8 +10,8 @@ export default function DoctorDashboardPage() {
 
   // Redirect to login if not authenticated
   React.useEffect(() => {
-    if (!user || user.role !== "Doctor") {
-      navigate("/login/doctor");
+    if (!user) {
+      navigate("/doctorlogin");
     }
   }, [user, navigate]);
 
@@ -19,7 +19,7 @@ export default function DoctorDashboardPage() {
     e.preventDefault();
     const id = patientId.trim();
     if (!id) return;
-    navigate(`/doctor/diagnosis/${encodeURIComponent(id)}`);
+    navigate(`/diagnosis/${encodeURIComponent(id)}`);
   };
 
   const handlePatientSearch = () => {
@@ -27,7 +27,7 @@ export default function DoctorDashboardPage() {
   };
 
   const handleRecentPrescriptions = () => {
-    navigate("/doctor/recent-prescriptions");
+    navigate("/recentpes");
   };
 
   

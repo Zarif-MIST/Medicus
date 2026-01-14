@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../services/api";
 import "./Doctorlogin.css";
 import { useAuth } from "../../context/AuthContext";
 
@@ -13,14 +14,15 @@ export default function DoctorLoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     // Basic validation
     if (!username.trim()) {
-      setError("Username is required");
+      setError("Username/Email is required");
       return;
     }
     if (!password.trim()) {
@@ -28,15 +30,28 @@ export default function DoctorLoginPage() {
       return;
     }
 
-    // Save user to auth context and localStorage
-    login(username, selectedRole);
+    setLoading(true);
 
-    console.log({ selectedRole, username, password });
+    try {
+      // Call API to login from MongoDB
+      const result = await loginUser(username, password, selectedRole);
 
-    // ✅ route based on role
-    if (selectedRole === "Doctor") navigate("/doctor/dashboard");
-    else if (selectedRole === "Pharmacy") navigate("/pharmacy/dashboard");
-    else navigate("/dashboard"); // patient dashboard (your existing route)
+      // Update auth context with user data from database
+      login(result.data.fullName, selectedRole);
+
+      console.log("Login successful:", result);
+
+      // Navigate based on role
+      if (selectedRole === "Doctor") navigate("/doctordash");
+      else if (selectedRole === "Pharmacy") navigate("/pharmacy/dashboard");
+      else navigate("/dashboard");
+
+    } catch (err) {
+      setError(err.message || "Login failed. Please check your credentials.");
+      console.error("Login error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const goToSignup = (e) => {
@@ -97,6 +112,7 @@ export default function DoctorLoginPage() {
                   key={role}
                   type="button"
                   onClick={() => setSelectedRole(role)}
+                  disabled={loading}
                   className={
                     "role-card" + (selectedRole === role ? " role-card-active" : "")
                   }
@@ -135,15 +151,32 @@ export default function DoctorLoginPage() {
 
              {/* form */}
             <form className="login-form" onSubmit={handleSubmit}>
-              {error && <div className="login-error">{error}</div>}
+              {error && (
+                <div style={{
+                  padding: '12px',
+                  marginBottom: '15px',
+                  backgroundColor: '#fee',
+                  border: '1px solid #fcc',
+                  borderRadius: '6px',
+                  color: '#c33',
+                  fontSize: '14px',
+                  textAlign: 'center'
+                }}>
+                  {error}
+                </div>
+              )}
 
               <label className="form-field">
-                <span className="field-label">User Name</span>
+                <span className="field-label">Email Address</span>
                 <input
-                  type="text"
-                  placeholder="Doctor_ID"
+                  type="email"
+                  placeholder="Enter your email"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    setError("");
+                  }}
+                  disabled={loading}
                 />
               </label>
 
@@ -153,7 +186,11 @@ export default function DoctorLoginPage() {
                   type="password"
                   placeholder="Enter Password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError("");
+                  }}
+                  disabled={loading}
                 />
               </label>
 
@@ -164,8 +201,13 @@ export default function DoctorLoginPage() {
               </div>
 
               {/* ✅ Sign In routes to dashboard */}
-              <button type="submit" className="signin-btn">
-                Sign In
+              <button 
+                type="submit" 
+                className="signin-btn"
+                disabled={loading}
+                style={{ opacity: loading ? 0.7 : 1 }}
+              >
+                {loading ? 'Signing In...' : 'Sign In'}
               </button>
 
               {/* ✅ Signup routes to registration */}

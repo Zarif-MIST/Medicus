@@ -37,7 +37,7 @@ export default function DoctorRecentPrescriptionsPage() {
           <button
             className="dash-action-card"
             type="button"
-            onClick={() => navigate("/doctor/dashboard")}
+            onClick={() => navigate("/doctordash")}
           >
             <span className="action-icon">🔍</span>
             <span className="action-label">Patient Search</span>

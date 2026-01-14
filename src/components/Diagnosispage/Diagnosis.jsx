@@ -9,17 +9,6 @@ export default function DiagnosisPage() {
   const { patientId } = useParams(); // coming from /doctor/diagnosis/:patientId
   const { user } = useAuth();
 
-  // Redirect to login if not authenticated
-  React.useEffect(() => {
-    if (!user || user.role !== "Doctor") {
-      navigate("/login/doctor");
-    }
-  }, [user, navigate]);
-
-  if (!user) {
-    return null; // Will redirect automatically
-  }
-
   const patient = useMemo(() => {
     // later you can fetch patient info by patientId
     return {
@@ -127,7 +116,7 @@ export default function DiagnosisPage() {
       <main className="diag-container">
         {/* Top dark banner */}
         <section className="diag-hero">
-          <p className="diag-hero-sub">Welcome Back, Dr. {user.username}</p>
+          <p className="diag-hero-sub">Welcome Back, Dr. {user?.username || 'Doctor'}</p>
           <p className="diag-hero-main">
             Access patient data, create diagnoses, and manage prescriptions
           </p>
@@ -298,7 +287,7 @@ export default function DiagnosisPage() {
           type="button"
           className="med-remove-btn"
           style={{ marginTop: 12 }}
-          onClick={() => navigate("/doctor/dashboard")}
+          onClick={() => navigate("/doctordash")}
         >
           Back to Dashboard
         </button>
