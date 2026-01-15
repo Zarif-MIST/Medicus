@@ -1,29 +1,52 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { getPatient, getPatientHistory, createPrescription } from "../../services/api";
 import "./Diagnosisstyle.css";
 import PrescriptionConfirmModal from "../PrescriptionConfirmModal/PrescriptionConfirmModal";
 import { useAuth } from "../../context/AuthContext";
 
 export default function DiagnosisPage() {
   const navigate = useNavigate();
-  const { patientId } = useParams(); // coming from /doctor/diagnosis/:patientId
+  const { patientId } = useParams();
   const { user } = useAuth();
 
-  const patient = useMemo(() => {
-    // later you can fetch patient info by patientId
-    return {
-      name: "Sinlam Ahmed",
-      id: patientId || "N/A",
-      age: 21,
-      gender: "Male",
-      bloodType: "A+",
-      prescriptions: 5,
-      allergies: "Penicillin, Sulfa drugs",
-      conditions: "Hypertension, Type 2 Diabetes",
-    };
+  const [patient, setPatient] = useState(null);
+  const [patientHistory, setPatientHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  
+  const [diagnosisText, setDiagnosisText] = useState("");
+
+  // Fetch patient data on mount
+  useEffect(() => {
+    if (patientId) {
+      fetchPatientData();
+      fetchPatientHistory();
+    }
   }, [patientId]);
 
-  const [diagnosisText, setDiagnosisText] = useState("");
+  const fetchPatientData = async () => {
+    try {
+      setLoading(true);
+      const response = await getPatient(patientId);
+      setPatient(response.data);
+      setError("");
+    } catch (err) {
+      console.error("Error fetching patient:", err);
+      setError(err.message || "Failed to load patient data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchPatientHistory = async () => {
+    try {
+      const response = await getPatientHistory(patientId);
+      setPatientHistory(response.data || []);
+    } catch (err) {
+      console.error("Error fetching patient history:", err);
+    }
+  };
 
   // dynamic medicines list
   const [medicines, setMedicines] = useState([]);
@@ -80,34 +103,95 @@ export default function DiagnosisPage() {
     setShowConfirmModal(true);
   };
 
-  const handleConfirmSend = () => {
-    // later: API call
-    console.log({
-      patientId: patient.id,
-      diagnosis: diagnosisText,
-      medicines,
-    });
+  const handleConfirmSend = async () => {
+    try {
+      // Prepare prescription data for API
+      const prescriptionData = {
+        patient: patientId,
+        diagnosis: {
+          condition: diagnosisText,
+          symptoms: [],
+          notes: diagnosisText
+        },
+        medications: medicines.map(med => ({
+          name: med.name,
+          dosage: med.dosage,
+          frequency: med.frequency,
+          duration: med.duration,
+          instructions: `Take ${med.frequency} for ${med.duration}`
+        })),
+        status: 'Active'
+      };
 
-    setShowConfirmModal(false);
-    // Navigate to pharmacist page
-    navigate("/doctor/pharmacy-dashboard", {
-      state: {
-        patientId: patient.id,
-        diagnosis: diagnosisText,
-        medicines,
-      },
-    });
+      // Save to database
+      await createPrescription(prescriptionData);
+
+      setShowConfirmModal(false);
+      
+      // Show success message and navigate
+      alert('Prescription created successfully!');
+      navigate("/recentpes");
+
+    } catch (err) {
+      console.error("Error creating prescription:", err);
+      alert(err.message || "Failed to create prescription");
+    }
   };
 
   const handleCancelModal = () => {
     setShowConfirmModal(false);
   };
 
+  // Loading and error states
+  if (loading) {
+    return (
+      <div className="Diagnosis-page">
+        <main className="diag-container" style={{ textAlign: 'center', padding: '50px' }}>
+          <p style={{ fontSize: '18px', color: '#666' }}>Loading patient data...</p>
+        </main>
+      </div>
+    );
+  }
+
+  if (error || !patient) {
+    return (
+      <div className="Diagnosis-page">
+        <main className="diag-container" style={{ textAlign: 'center', padding: '50px' }}>
+          <p style={{ fontSize: '18px', color: '#ff4444', marginBottom: '20px' }}>
+            {error || 'Patient not found'}
+          </p>
+          <button 
+            onClick={() => navigate('/doctordash')}
+            style={{
+              padding: '10px 20px',
+              background: '#2c3e50',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            ← Back to Dashboard
+          </button>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="Diagnosis-page">
       <PrescriptionConfirmModal
         isOpen={showConfirmModal}
-        patient={patient}
+        patient={{
+          name: patient.fullName,
+          id: patient._id,
+          age: patient.age,
+          gender: patient.gender,
+          bloodType: patient.bloodType,
+          prescriptions: patientHistory.length,
+          allergies: patient.allergies?.join(', ') || 'None',
+          conditions: patient.chronicConditions?.join(', ') || 'None'
+        }}
         diagnosis={diagnosisText}
         medicines={medicines}
         onCancel={handleCancelModal}
@@ -129,9 +213,9 @@ export default function DiagnosisPage() {
               <span className="avatar-icon">👤</span>
             </div>
             <div>
-              <h2 className="patient-name">{patient.name}</h2>
+              <h2 className="patient-name">{patient.fullName}</h2>
               <p className="patient-meta">
-                Patient ID: <span>{patient.id}</span>
+                Patient ID: <span>{patient._id}</span>
               </p>
             </div>
           </div>
@@ -151,14 +235,52 @@ export default function DiagnosisPage() {
             </div>
             <div className="stat-card">
               <p className="stat-label">Prescriptions</p>
-              <p className="stat-value">{patient.prescriptions}</p>
+              <p className="stat-value">{patientHistory.length}</p>
             </div>
           </div>
 
           <div className="patient-extra">
             <div>
               <p className="extra-label">Allergies</p>
-              <p className="extra-value">{patient.allergies}</p>
+              <p className="extra-value">{patient.allergies?.join(', ') || 'None'}</p>
+            </div>
+            <div>
+              <p className="extra-label">Chronic Conditions</p>
+              <p className="extra-value">{patient.chronicConditions?.join(', ') || 'None'}</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Patient History Section */}
+        {patientHistory.length > 0 && (
+          <section className="patient-card" style={{ marginTop: '20px' }}>
+            <h3 style={{ marginBottom: '15px', color: '#2c3e50' }}>
+              📋 Prescription History
+            </h3>
+            <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+              {patientHistory.map((prescription, idx) => (
+                <div 
+                  key={prescription._id}
+                  style={{
+                    padding: '10px',
+                    borderBottom: '1px solid #eee',
+                    marginBottom: '10px'
+                  }}
+                >
+                  <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                    {prescription.prescriptionCode} - {new Date(prescription.prescriptionDate).toLocaleDateString()}
+                  </p>
+                  <p style={{ fontSize: '14px', color: '#666' }}>
+                    {prescription.diagnosis?.condition || 'No diagnosis'}
+                  </p>
+                  <p style={{ fontSize: '13px', color: '#999' }}>
+                    {prescription.medications?.length || 0} medication(s) - Status: {prescription.status}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
             </div>
             <div>
               <p className="extra-label">Current Conditions</p>

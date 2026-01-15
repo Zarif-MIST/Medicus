@@ -1,14 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getRecentPrescriptions, getPatient } from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
 import "./Recentpes.css";
 
 export default function DoctorRecentPrescriptionsPage() {
   const [patientId, setPatientId] = useState("");
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // Fetch recent prescriptions on component mount
+  useEffect(() => {
+    fetchPrescriptions();
+  }, []);
+
+  const fetchPrescriptions = async () => {
+    try {
+      setLoading(true);
+      const response = await getRecentPrescriptions(10);
+      setPrescriptions(response.data || []);
+      setError("");
+    } catch (err) {
+      console.error("Error fetching prescriptions:", err);
+      setError(err.message || "Failed to load prescriptions");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log("Search patient:", patientId);
+    const id = patientId.trim();
+    if (!id) return;
+    navigate(`/diagnosis/${encodeURIComponent(id)}`);
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
   };
 
   return (
@@ -18,7 +54,7 @@ export default function DoctorRecentPrescriptionsPage() {
         {/* Top hero banner */}
         <section className="dash-hero">
           <div className="dash-hero-text">
-            <p className="hero-sub">Welcome Back, Dr. Ahnaf</p>
+            <p className="hero-sub">Welcome Back, Dr. {user?.username || 'Doctor'}</p>
             <h2 className="hero-title">
               Access patient data, create diagnoses, and manage prescriptions
             </h2>
@@ -80,41 +116,65 @@ export default function DoctorRecentPrescriptionsPage() {
         <section className="recent-card">
           <h2 className="recent-title">Recent Prescriptions</h2>
 
-          <div className="rx-list">
-            <div className="rx-row">
-              <div className="rx-left">
-                <p className="rx-code">RX001 - kuddus</p>
-                <p className="rx-drug">Amoxicillin 500mg</p>
-                <p className="rx-drug">Mebendazole 100mg</p>
-              </div>
-              <div className="rx-right">
-                <span className="rx-date">2024-12-20</span>
-                <span className="rx-chip rx-chip-active">Active</span>
-              </div>
+          {loading && (
+            <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+              Loading prescriptions...
             </div>
+          )}
 
-            <div className="rx-row">
-              <div className="rx-left">
-                <p className="rx-code">RX002 - Sinlam Smith</p>
-                <p className="rx-drug">Ibuprofen 400mg</p>
-              </div>
-              <div className="rx-right">
-                <span className="rx-date">2024-12-19</span>
-                <span className="rx-chip rx-chip-complete">Completed</span>
-              </div>
+          {error && (
+            <div style={{ textAlign: 'center', padding: '20px', color: '#ff4444' }}>
+              {error}
             </div>
+          )}
 
-            <div className="rx-row">
-              <div className="rx-left">
-                <p className="rx-code">RX003 - Shafi Ahmed</p>
-                <p className="rx-drug">Napa 500mg</p>
-              </div>
-              <div className="rx-right">
-                <span className="rx-date">2024-12-18</span>
-                <span className="rx-chip rx-chip-active">Active</span>
-              </div>
+          {!loading && !error && prescriptions.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+              <p style={{ fontSize: '18px', marginBottom: '10px' }}>📋 No prescriptions yet</p>
+              <p style={{ fontSize: '14px' }}>Create your first prescription by searching for a patient</p>
             </div>
-          </div>
+          )}
+
+          {!loading && !error && prescriptions.length > 0 && (
+            <div className="rx-list">
+              {prescriptions.map((prescription) => (
+                <div 
+                  key={prescription._id} 
+                  className="rx-row"
+                  onClick={() => navigate(`/prescription/${prescription._id}`)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className="rx-left">
+                    <p className="rx-code">
+                      {prescription.prescriptionCode} - {prescription.patient?.fullName || 'Unknown Patient'}
+                    </p>
+                    {prescription.medications?.map((med, idx) => (
+                      <p key={idx} className="rx-drug">
+                        {med.name} {med.dosage}
+                      </p>
+                    ))}
+                    {prescription.diagnosis?.condition && (
+                      <p style={{ fontSize: '13px', color: '#666', marginTop: '5px' }}>
+                        Diagnosis: {prescription.diagnosis.condition}
+                      </p>
+                    )}
+                  </div>
+                  <div className="rx-right">
+                    <span className="rx-date">
+                      {formatDate(prescription.prescriptionDate)}
+                    </span>
+                    <span className={`rx-chip ${
+                      prescription.status === 'Active' ? 'rx-chip-active' : 
+                      prescription.status === 'Completed' ? 'rx-chip-complete' : 
+                      'rx-chip-cancelled'
+                    }`}>
+                      {prescription.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       </main>
     </div>

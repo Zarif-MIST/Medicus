@@ -21,6 +21,8 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded data
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/doctor', require('./routes/doctor'));
+app.use('/api/patient', require('./routes/patient'));
+app.use('/api/prescription', require('./routes/prescription'));
 
 // Test route
 app.get('/', (req, res) => {
@@ -35,6 +37,17 @@ app.get('/', (req, res) => {
       doctor: {
         profile: 'GET /api/doctor/profile (requires auth)',
         updateProfile: 'PUT /api/doctor/profile (requires auth)'
+      },
+      patient: {
+        getPatient: 'GET /api/patient/:id (requires auth)',
+        createPatient: 'POST /api/patient (requires auth)',
+        getHistory: 'GET /api/patient/:id/history (requires auth)'
+      },
+      prescription: {
+        create: 'POST /api/prescription (requires auth)',
+        recent: 'GET /api/prescription/recent (requires auth)',
+        getOne: 'GET /api/prescription/:id (requires auth)',
+        updateStatus: 'PUT /api/prescription/:id/status (requires auth)'
       }
     }
   });
