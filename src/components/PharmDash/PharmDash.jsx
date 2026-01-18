@@ -1,9 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './PharmDash.css';
+import { useAuth } from '../../context/AuthContext';
 
 export default function PharmDash() {
   const navigate = useNavigate();
+  const { user, initializing } = useAuth();
+  const [inventory, setInventory] = useState([]);
+
+  // Load inventory - must be called before any conditional returns
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('pharmacyInventory');
+      const parsed = stored ? JSON.parse(stored) : [];
+      if (Array.isArray(parsed)) setInventory(parsed);
+    } catch (err) {
+      // ignore parse errors
+    }
+  }, []);
+
+  // Redirect to login if not authenticated
+  React.useEffect(() => {
+    if (initializing) return;
+    const role = localStorage.getItem("medicus_role");
+    if (!user || !role?.includes("pharmacy")) {
+      navigate("/login");
+    }
+  }, [user, navigate, initializing]);
+
+  if (initializing || !user) {
+    return null;
+  }
+
+  const totalMedicines = inventory.length;
+  const lowStockCount = inventory.filter((item) => item.status === 'Low Stock').length;
+  const expiringCount = inventory.filter((item) => item.status === 'Expiring Soon').length;
+
   const stats = [
     {
       label: 'Prescriptions',
@@ -19,7 +51,7 @@ export default function PharmDash() {
     },
     {
       label: 'Medicines',
-      value: '342',
+      value: String(totalMedicines),
       status: 'Total',
       tone: 'dark',
       icon: (
@@ -31,7 +63,7 @@ export default function PharmDash() {
     },
     {
       label: 'Low Stock',
-      value: '8',
+      value: String(lowStockCount),
       status: 'Alert',
       tone: 'warning',
       icon: (
@@ -44,7 +76,7 @@ export default function PharmDash() {
     },
     {
       label: 'Expiring Soon',
-      value: '5',
+      value: String(expiringCount),
       status: 'Warning',
       tone: 'alert',
       icon: (
@@ -73,7 +105,7 @@ export default function PharmDash() {
       <div className="pharm-layout">
         <header className="pharm-header">
           <h1>Pharmacy Dashboard</h1>
-          <p>Welcome back, Mr. Pharmacists</p>
+          <p>Welcome back, {user?.managerName || user?.pharmacyName || 'Pharmacist'}</p>
         </header>
 
         <div className="pharm-stats">
@@ -100,32 +132,42 @@ export default function PharmDash() {
             <h3>Quick Actions</h3>
             <div className="quick-row">
               <button className="scan-btn">
-                <span className="icon-dot" />
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="5" height="5" rx="1" />
+                  <rect x="10" y="3" width="5" height="5" rx="1" />
+                  <rect x="3" y="10" width="5" height="5" rx="1" />
+                  <path d="M10 10h3v3h-3z" />
+                  <path d="M13 13h2v2h-2z" />
+                  <path d="M15 15h3v3h-3z" />
+                  <path d="M12 16h3" />
+                  <path d="M16 12h2" />
+                  <path d="M12 12h1" />
+                </svg>
                 Scan Prescription
               </button>
-              <div className="search-box">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="7" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
-                <input type="text" placeholder="Search Patient ID" />
-              </div>
             </div>
           </div>
 
           <div className="pharm-card alerts-card">
             <h3>Alerts</h3>
             <div className="alert-item alert-red">
-              <span className="alert-icon">⚠️</span>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v5l3 2" />
+              </svg>
               <div>
-                <div className="alert-title">5 medicines expiring soon</div>
+                <div className="alert-title">{expiringCount} medicines expiring soon</div>
                 <div className="alert-sub">Check inventory</div>
               </div>
             </div>
             <div className="alert-item alert-yellow">
-              <span className="alert-icon">🔔</span>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
               <div>
-                <div className="alert-title">8 items low in stock</div>
+                <div className="alert-title">{lowStockCount} items low in stock</div>
                 <div className="alert-sub">Reorder required</div>
               </div>
             </div>

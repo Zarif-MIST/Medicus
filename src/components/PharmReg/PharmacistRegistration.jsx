@@ -1,9 +1,65 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './styles/PharmacistRegister.css';
+import { useAuth } from '../../context/AuthContext';
 
 export default function PharmacistRegistration() {
   const navigate = useNavigate();
+  const { pharmacyRegister } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    pharmacyName: '',
+    licenseNumber: '',
+    password: '',
+    confirmPassword: '',
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Password and Confirm Password must match');
+      return;
+    }
+
+    const payload = {
+      pharmacyName: formData.pharmacyName,
+      managerName: formData.fullName,
+      email: formData.email,
+      password: formData.password,
+      phoneNumber: formData.phone,
+      licenseNumber: formData.licenseNumber,
+      address: '',
+    };
+
+    setSubmitting(true);
+    try {
+      const resp = await pharmacyRegister(payload);
+      if (resp?.pharmacy?.pharmacyId) {
+        alert(`Registration successful!\n\nYour Pharmacy ID: ${resp.pharmacy.pharmacyId}\nUse this ID or your email to login.`);
+        navigate('/login');
+      } else {
+        setError(resp?.message || 'Registration failed');
+      }
+    } catch (err) {
+      setError(err.message || 'Registration failed');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <section className="register-section">
@@ -42,18 +98,63 @@ export default function PharmacistRegistration() {
         <div className="form-card">
           <form
             className="register-form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              navigate('/pharmacy-dashboard');
-            }}
+            onSubmit={handleSubmit}
           >
-            <input type="text" placeholder="Full name" required />
-            <input type="email" placeholder="Email" required />
-            <input type="tel" placeholder="Phone number" />
-            <input type="text" placeholder="Pharmacy name" />
-            <input type="text" placeholder="Pharmacy license number" required />
-            <input type="password" placeholder="Password" required />
-            <input type="password" placeholder="Confirm password" required />
+            {error && <div className="register-error">{error}</div>}
+            <input
+              type="text"
+              name="fullName"
+              placeholder="Full name"
+              value={formData.fullName}
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="tel"
+              name="phone"
+              placeholder="Phone number"
+              value={formData.phone}
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="pharmacyName"
+              placeholder="Pharmacy name"
+              value={formData.pharmacyName}
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="licenseNumber"
+              placeholder="Pharmacy license number"
+              value={formData.licenseNumber}
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="Confirm password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+            />
 
             <label className="checkbox-label">
               <input type="checkbox" required />
@@ -62,7 +163,7 @@ export default function PharmacistRegistration() {
             </label>
 
             <button type="submit" className="register-button">
-              Register
+              {submitting ? 'Registering...' : 'Register'}
             </button>
           </form>
         </div>

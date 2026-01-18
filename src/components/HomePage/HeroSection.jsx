@@ -2,6 +2,13 @@ import React from 'react';
 import heroIllustration from '../../assets/photo-rename.png';
 
 const HeroSection = () => {
+  const handleGetStarted = () => {
+    const roleSection = document.getElementById('role-section');
+    if (roleSection) {
+      roleSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-[#fff8f0] overflow-hidden">
       {/* Background subtle shapes (optional decorative elements) */}
@@ -28,7 +35,10 @@ const HeroSection = () => {
           <p className="mt-8 text-xl text-gray-700 leading-relaxed">
             Connecting doctors, pharmacists, and patients in one comprehensive platform.
           </p>
-          <button className="mt-10 inline-block px-10 py-5 bg-red-700 text-white text-lg font-semibold rounded-full shadow-lg hover:bg-red-800 transition duration-300">
+          <button 
+            onClick={handleGetStarted}
+            className="mt-10 px-10 py-5 bg-red-700 text-white text-lg font-semibold rounded-full shadow-lg hover:bg-red-800 transition duration-300 cursor-pointer"
+          >
             Get Started
           </button>
         </div>

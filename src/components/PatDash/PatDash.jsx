@@ -1,19 +1,37 @@
 // src/components/PatientDashboard.jsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './PatDash.css';
 
 export default function PatientDashboard() {
+  const [patientName, setPatientName] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Retrieve the patient's name from localStorage
+    const name = localStorage.getItem('patientName');
+    if (name) {
+      setPatientName(name);
+    }
+  }, []);
+
   return (
     <div className="dashboard">
+      {/* Welcome Back Card */}
+      {patientName && (
+        <div className="welcome-card">
+          <div className="welcome-content">
+            <h2 className="welcome-title">Welcome back, {patientName}!</h2>
+            <p className="welcome-message">Your health is our priority. Check your latest medical information below.</p>
+          </div>
+        </div>
+      )}
+
       {/* Top Summary Cards */}
       <div className="summary-cards">
         <div className="summary-card">
           <div className="summary-icon visits">15</div>
           <div className="summary-label">Medical Visits</div>
-        </div>
-        <div className="summary-card">
-          <div className="summary-icon heart">Good</div>
-          <div className="summary-label">Health Status</div>
         </div>
         <div className="summary-card">
           <div className="summary-icon prescriptions">3</div>
@@ -23,9 +41,9 @@ export default function PatientDashboard() {
 
       {/* Tabs */}
       <div className="tabs">
-        <button className="tab active">Overview</button>
-        <button className="tab">Prescriptions</button>
-        <button className="tab">Medical Records</button>
+        <button className="tab active" onClick={() => navigate('/dashboard')}>Overview</button>
+        <button className="tab" onClick={() => navigate('/prescriptions')}>Prescriptions</button>
+        <button className="tab" onClick={() => navigate('/medical-records')}>Medical Records</button>
       </div>
 
       {/* Main Content Grid */}
@@ -37,7 +55,7 @@ export default function PatientDashboard() {
     
           </div>
           <div className="prescription-item">
-            <div className="prescription-name">Amoxicillin 500mg</div>
+            <div className="prescription-name">Amoxicillin 500mg <br /></div>
             <div className="prescription-doctor">Prescribed by Dr. Anis</div>
             <div className="prescription-details">
               <div>
@@ -51,32 +69,6 @@ export default function PatientDashboard() {
             </div>
             <div className="prescription-instructions">
               Instructions: Take with food
-            </div>
-            <button className="qr-button">View QR Code</button>
-          </div>
-        </div>
-
-        {/* Vital Signs */}
-        <div className="section-card">
-          <div className="section-header">
-            <h3>Vital Signs</h3>
-          </div>
-          <div className="vital-list">
-            <div className="vital-item">
-              <span>Blood Pressure</span>
-              <strong>120/80</strong>
-            </div>
-            <div className="vital-item">
-              <span>Heart Rate</span>
-              <strong>72 bpm</strong>
-            </div>
-            <div className="vital-item">
-              <span>Temperature</span>
-              <strong>98.6°F</strong>
-            </div>
-            <div className="vital-item">
-              <span>Weight</span>
-              <strong>165 lbs</strong>
             </div>
           </div>
         </div>

@@ -37,7 +37,7 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <section className="features-section">
+    <section id="features-section" className="features-section">
       <div className="features-container">
         <h2 className="features-title">
           The Most <span className="highlight">Trusted</span> Healthcare Platform

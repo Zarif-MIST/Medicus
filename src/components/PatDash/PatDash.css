@@ -9,6 +9,46 @@
   min-height: 100vh;
 }
 
+/* Welcome Card */
+.welcome-card {
+  background: linear-gradient(135deg, #991b1b 0%, #7a1515 100%);
+  border-radius: 20px;
+  padding: 40px;
+  margin-bottom: 40px;
+  box-shadow: 0 8px 24px rgba(153, 27, 27, 0.15);
+  color: white;
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.welcome-content {
+  max-width: 100%;
+}
+
+.welcome-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.5px;
+}
+
+.welcome-message {
+  font-size: 16px;
+  margin: 0;
+  opacity: 0.95;
+  line-height: 1.6;
+}
+
 /* Summary Cards */
 .summary-cards {
   display: flex;
@@ -109,37 +149,75 @@
 }
 
 /* Active Prescription */
+.prescription-item {
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
 .prescription-name {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
   margin-bottom: 8px;
+  word-break: break-word;
 }
 
 .prescription-doctor {
   color: #666;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  font-size: 15px;
 }
 
 .prescription-details {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
   color: #444;
+  font-size: 14px;
+}
+
+.prescription-details div {
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+}
+
+.prescription-details strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13px;
+  color: #991b1b;
 }
 
 .prescription-instructions {
   color: #666;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   font-style: italic;
+  font-size: 14px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
 }
 
 .qr-button {
-  background: #f9f9f9;
-  border: 1px solid #ddd;
+  background: #991b1b;
+  color: white;
+  border: none;
   border-radius: 12px;
   padding: 12px 24px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 500;
+  width: 100%;
+  transition: all 0.3s;
+}
+
+.qr-button:hover {
+  background: #7a1515;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(153, 27, 27, 0.2);
 }
 
 /* Vital Signs */
@@ -203,23 +281,125 @@
 @media (max-width: 1024px) {
   .main-grid {
     grid-template-columns: 1fr;
+    gap: 24px;
   }
 
   .section-card.large {
     grid-row: auto;
   }
+
+  .welcome-card {
+    padding: 30px 20px;
+    margin-bottom: 30px;
+  }
+
+  .welcome-title {
+    font-size: 26px;
+  }
 }
 
 @media (max-width: 768px) {
+  .dashboard {
+    padding: 0 16px;
+    margin: 20px auto;
+  }
+
   .summary-cards {
     flex-direction: column;
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+
+  .summary-card {
+    padding: 20px;
+    min-width: 100%;
   }
 
   .tabs {
     flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 30px;
   }
 
+  .tab {
+    flex: 1;
+    min-width: 100px;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .section-card {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .section-header h3 {
+    font-size: 18px;
+  }
+
+  .prescription-name {
+    font-size: 18px;
+  }
+
+  .prescription-details {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .welcome-title {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+
+  .welcome-message {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
   .dashboard {
-    padding: 0 20px;
+    padding: 0 12px;
+    margin: 16px auto;
+  }
+
+  .welcome-card {
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 16px;
+  }
+
+  .welcome-title {
+    font-size: 18px;
+  }
+
+  .summary-card {
+    padding: 16px;
+  }
+
+  .summary-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+  }
+
+  .summary-label {
+    font-size: 14px;
+  }
+
+  .section-card {
+    padding: 16px;
+  }
+
+  .section-header h3 {
+    font-size: 16px;
+  }
+
+  .prescription-name {
+    font-size: 16px;
+  }
+
+  .qr-button {
+    padding: 10px 16px;
+    font-size: 14px;
   }
 }

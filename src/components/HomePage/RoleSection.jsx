@@ -46,7 +46,7 @@ export default function RoleSection() {
   ];
 
   return (
-    <section className="py-16 bg-[#FFF8F0]">
+    <section id="role-section" className="py-16 bg-[#FFF8F0]">
       <div className="max-w-7xl mx-auto px-6">
         {/* Heading */}
         <div className="text-center mb-12">
@@ -59,7 +59,14 @@ export default function RoleSection() {
         {/* Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {roles.map((role, index) => {
-            const targetPath = role.title === 'Pharmacy' ? '/pharmacist-register' : '/register';
+            let targetPath;
+            if (role.title === 'Pharmacy') {
+              targetPath = '/pharmacist-register';
+            } else if (role.title === 'Doctors') {
+              targetPath = '/doctor-register';
+            } else {
+              targetPath = '/register';
+            }
 
             return (
               <div

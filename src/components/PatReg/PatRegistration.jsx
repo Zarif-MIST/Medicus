@@ -1,10 +1,60 @@
 // src/components/RegisterSection.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../PatReg/styles/RegisterSection.css';
+import { useAuth } from '../../context/AuthContext';
 
 export default function RegisterSection() {
   const navigate = useNavigate();
+  const { patientRegister } = useAuth();
+
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    const fullName = e.target.elements[0].value;
+    const email = e.target.elements[1].value;
+    const phone = e.target.elements[2].value;
+    const dob = e.target.elements[3].value;
+    const password = e.target.elements[4].value;
+    const confirmPassword = e.target.elements[5].value;
+
+    if (password !== confirmPassword) {
+      setError('Password and Confirm Password must match');
+      return;
+    }
+
+    const [firstName, ...rest] = fullName.trim().split(' ');
+    const payload = {
+      firstName: firstName || fullName,
+      lastName: rest.join(' ') || '',
+      email,
+      password,
+      phoneNumber: phone,
+      dateOfBirth: dob,
+      gender: '',
+      address: '',
+    };
+
+    setSubmitting(true);
+    try {
+      const resp = await patientRegister(payload);
+      if (resp?.patient?.patientId) {
+        alert(`Registration successful!\n\nYour Patient ID: ${resp.patient.patientId}\nUse this ID or your email to login.`);
+        navigate('/login');
+      } else {
+        setError(resp?.message || 'Registration failed');
+      }
+    } catch (err) {
+      setError(err.message || 'Registration failed');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <section className="register-section">
       <div className="register-container">
@@ -40,12 +90,12 @@ export default function RegisterSection() {
 
         {/* Right Side - Form */}
         <div className="form-card">
-          <form className="register-form" onSubmit={(e) => { e.preventDefault(); navigate('/dashboard'); }}>
+          <form className="register-form" onSubmit={handleSubmit}>
+            {error && <div className="register-error">{error}</div>}
             <input type="text" placeholder="Full name" required />
             <input type="email" placeholder="Email" required />
             <input type="tel" placeholder="Phone number" />
-            <input type="date" placeholder="Date of birth" />
-            <input type="text" placeholder="Pharmacy License Number" />
+            <input type="date" placeholder="Date of birth" required />
             <input type="password" placeholder="Password" required />
             <input type="password" placeholder="Confirm Password" required />
 
@@ -56,7 +106,7 @@ export default function RegisterSection() {
             </label>
 
             <button type="submit" className="register-button">
-              Register
+              {submitting ? 'Registering...' : 'Register'}
             </button>
           </form>
         </div>
