@@ -118,7 +118,6 @@ export default function PharmDashInventory() {
       setSuccess('');
       
       // Update the medicine quantity
-      const quantityChange = parseInt(editData.quantity, 10) - parseInt(editData.quantity, 10);
       await apiService.updateMedicineQuantity(editData.id, parseInt(editData.quantity, 10), 'restock');
       
       setInventory((prev) => prev.map((item) => {

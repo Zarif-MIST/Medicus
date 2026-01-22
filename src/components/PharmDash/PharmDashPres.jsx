@@ -26,18 +26,17 @@ export default function PharmDashPres() {
       navigate("/login");
     } else {
       // Fetch pharmacy inventory on mount
+      const fetchInventory = async () => {
+        try {
+          const data = await apiService.getPharmacyInventory(user.id);
+          setInventory(data.inventory || []);
+        } catch (error) {
+          console.error('Failed to fetch inventory:', error);
+        }
+      };
       fetchInventory();
     }
   }, [user, navigate, initializing]);
-
-  const fetchInventory = async () => {
-    try {
-      const data = await apiService.getPharmacyInventory(user.id);
-      setInventory(data.inventory || []);
-    } catch (error) {
-      console.error('Failed to fetch inventory:', error);
-    }
-  };
 
   if (initializing || !user) {
     return null;

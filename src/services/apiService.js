@@ -1,5 +1,5 @@
-// Change the port here if your backend runs on a different one (e.g., 5001)
-const API_BASE_URL = 'http://localhost:5001/api';
+// Use relative URLs so CRA proxy routes to backend at http://localhost:5001
+const API_BASE_URL = '/api';
 
 export const apiService = {
   // Doctor APIs
