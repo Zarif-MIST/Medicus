@@ -1,0 +1,206 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './PharmDash.css';
+import { useAuth } from '../../context/AuthContext';
+
+export default function PharmDash() {
+  const navigate = useNavigate();
+  const { user, initializing } = useAuth();
+  const [inventory, setInventory] = useState([]);
+
+  // Load inventory - must be called before any conditional returns
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('pharmacyInventory');
+      const parsed = stored ? JSON.parse(stored) : [];
+      if (Array.isArray(parsed)) setInventory(parsed);
+    } catch (err) {
+      // ignore parse errors
+    }
+  }, []);
+
+  // Redirect to login if not authenticated
+  React.useEffect(() => {
+    if (initializing) return;
+    const role = localStorage.getItem("medicus_role");
+    if (!user || !role?.includes("pharmacy")) {
+      navigate("/login");
+    }
+  }, [user, navigate, initializing]);
+
+  if (initializing || !user) {
+    return null;
+  }
+
+  const totalMedicines = inventory.length;
+  const lowStockCount = inventory.filter((item) => item.status === 'Low Stock').length;
+  const expiringCount = inventory.filter((item) => item.status === 'Expiring Soon').length;
+
+  const stats = [
+    {
+      label: 'Prescriptions',
+      value: '24',
+      status: 'Pending',
+      tone: 'accent',
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="4" />
+          <path d="M8 8h8M8 12h8M8 16h5" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Medicines',
+      value: String(totalMedicines),
+      status: 'Total',
+      tone: 'dark',
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="4" />
+          <path d="M9 3v18M3 9h18" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Low Stock',
+      value: String(lowStockCount),
+      status: 'Alert',
+      tone: 'warning',
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Expiring Soon',
+      value: String(expiringCount),
+      status: 'Warning',
+      tone: 'alert',
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5l3 2" />
+        </svg>
+      ),
+    },
+  ];
+
+  const activities = [
+    { title: 'Prescription Filled', subtitle: 'RX005 • 2 hours ago' },
+    { title: 'Stock Updated', subtitle: 'Aspirin 100mg • 4 hours ago' },
+    { title: 'Prescription Verified', subtitle: 'RX004 • 5 hours ago' },
+  ];
+
+  const summary = [
+    { label: 'Verified', value: '18' },
+    { label: 'Filled', value: '15' },
+    { label: 'Pending', value: '6' },
+  ];
+
+  return (
+    <section className="pharm-page">
+      <div className="pharm-layout">
+        <header className="pharm-header">
+          <h1>Pharmacy Dashboard</h1>
+          <p>Welcome back, {user?.managerName || user?.pharmacyName || 'Pharmacist'}</p>
+        </header>
+
+        <div className="pharm-stats">
+          {stats.map((card) => (
+            <div key={card.label} className={`pharm-card stat-card ${card.tone}`}>
+              <div className="stat-icon">{card.icon}</div>
+              <div className="stat-meta">
+                <div className="stat-value">{card.value}</div>
+                <div className="stat-label">{card.label}</div>
+              </div>
+              <div className="stat-status">{card.status}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="pharm-tabs">
+          <button className="tab active" onClick={() => navigate('/pharmacy-dashboard')}>Overview</button>
+          <button className="tab" onClick={() => navigate('/pharmacy-prescriptions')}>Prescriptions</button>
+          <button className="tab" onClick={() => navigate('/pharmacy-inventory')}>Inventory</button>
+        </div>
+
+        <div className="pharm-grid">
+          <div className="pharm-card quick-card">
+            <h3>Quick Actions</h3>
+            <div className="quick-row">
+              <button className="scan-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="5" height="5" rx="1" />
+                  <rect x="10" y="3" width="5" height="5" rx="1" />
+                  <rect x="3" y="10" width="5" height="5" rx="1" />
+                  <path d="M10 10h3v3h-3z" />
+                  <path d="M13 13h2v2h-2z" />
+                  <path d="M15 15h3v3h-3z" />
+                  <path d="M12 16h3" />
+                  <path d="M16 12h2" />
+                  <path d="M12 12h1" />
+                </svg>
+                Scan Prescription
+              </button>
+            </div>
+          </div>
+
+          <div className="pharm-card alerts-card">
+            <h3>Alerts</h3>
+            <div className="alert-item alert-red">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v5l3 2" />
+              </svg>
+              <div>
+                <div className="alert-title">{expiringCount} medicines expiring soon</div>
+                <div className="alert-sub">Check inventory</div>
+              </div>
+            </div>
+            <div className="alert-item alert-yellow">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              <div>
+                <div className="alert-title">{lowStockCount} items low in stock</div>
+                <div className="alert-sub">Reorder required</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="pharm-card summary-card">
+            <h3>Today&apos;s Summary</h3>
+            <ul>
+              {summary.map((row) => (
+                <li key={row.label}>
+                  <span>{row.label}</span>
+                  <strong>{row.value}</strong>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="pharm-card activity-card">
+            <h3>Recent Activity</h3>
+            <ul>
+              {activities.map((item) => (
+                <li key={item.title}>
+                  <span className="bullet" />
+                  <div>
+                    <div className="activity-title">{item.title}</div>
+                    <div className="activity-sub">{item.subtitle}</div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

@@ -1,0 +1,196 @@
+/* Pharmacist registration styles */
+.register-section {
+  padding: 60px 20px;
+  background-color: #fff5f5;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.register-container {
+  display: flex;
+  max-width: 1200px;
+  width: 100%;
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  gap: 60px;
+  padding: 60px;
+}
+
+.info-card {
+  flex: 1;
+  background-color: #991b1b;
+  color: white;
+  border-radius: 24px;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.user-icon {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 40px;
+  color: white;
+}
+
+.user-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.info-title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 50px;
+  line-height: 1.4;
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  font-size: 18px;
+}
+
+.features-list li {
+  margin-bottom: 32px;
+}
+
+.features-list li strong {
+  font-size: 20px;
+}
+
+.form-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.register-form {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.register-form input[type="text"],
+.register-form input[type="email"],
+.register-form input[type="tel"],
+.register-form input[type="date"],
+.register-form input[type="password"] {
+  width: 100%;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border: 2px solid #ddd;
+  border-radius: 50px;
+  font-size: 16px;
+  background-color: #fafafa;
+  transition: border-color 0.3s;
+}
+
+.register-form input:focus {
+  outline: none;
+  border-color: #991b1b;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  margin: 24px 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-label input {
+  opacity: 0;
+  position: absolute;
+}
+
+.checkmark {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  margin-right: 12px;
+  position: relative;
+  transition: all 0.3s;
+}
+
+.checkbox-label input:checked ~ .checkmark {
+  background-color: #991b1b;
+  border-color: #991b1b;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-label input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.register-button {
+  width: 100%;
+  padding: 18px;
+  background-color: #991b1b;
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s;
+}
+
+.register-button:hover {
+  background-color: #7f1616;
+}
+
+@media (max-width: 1024px) {
+  .register-container {
+    flex-direction: column;
+    padding: 40px;
+    gap: 40px;
+  }
+
+  .info-card {
+    padding: 50px 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .register-container {
+    padding: 30px 20px;
+    border-radius: 16px;
+  }
+
+  .info-title {
+    font-size: 24px;
+  }
+
+  .features-list {
+    font-size: 16px;
+  }
+
+  .features-list li strong {
+    font-size: 18px;
+  }
+}
