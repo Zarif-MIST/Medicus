@@ -248,6 +248,10 @@ export default function DiagnosisPage() {
               <p className="extra-label">Chronic Conditions</p>
               <p className="extra-value">{patient.chronicConditions?.join(', ') || 'None'}</p>
             </div>
+            <div>
+              <p className="extra-label">Current Conditions</p>
+              <p className="extra-value">{patient.conditions || 'None'}</p>
+            </div>
           </div>
         </section>
 
@@ -281,13 +285,6 @@ export default function DiagnosisPage() {
             </div>
           </section>
         )}
-            </div>
-            <div>
-              <p className="extra-label">Current Conditions</p>
-              <p className="extra-value">{patient.conditions}</p>
-            </div>
-          </div>
-        </section>
 
         {/* Diagnosis card */}
         <section className="panel-card">

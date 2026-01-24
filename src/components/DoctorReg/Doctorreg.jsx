@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Doctorreg.css";
-import { useAuth } from "../../context/AuthContext";
+import { apiService } from "../../services/apiService";
 
 export default function RegistrationPage() {
   const navigate = useNavigate();
-  const { doctorRegister } = useAuth();
 
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -45,31 +44,25 @@ export default function RegistrationPage() {
     setSubmitting(true);
 
     try {
-      const nameParts = formData.fullName.trim().split(" ");
-      const firstName = nameParts[0];
-      const lastName = nameParts.slice(1).join(" ") || "N/A";
-
-      if (!firstName || firstName.length === 0) {
+      if (!formData.fullName || formData.fullName.trim().length === 0) {
         setError("Please enter your full name");
         setSubmitting(false);
         return;
       }
 
       const payload = {
-        firstName,
-        lastName,
+        fullName: formData.fullName,
         email: formData.email,
+        phone: formData.phone,
+        dob: formData.dob || "1990-01-01",
+        license: formData.license,
         password: formData.password,
-        phoneNumber: formData.phone,
-        specialization: "General",
-        licenseNumber: formData.license,
-        hospitalAffiliation: "",
       };
 
-      const resp = await doctorRegister(payload);
+      const resp = await apiService.doctorRegister(payload);
 
-      if (resp?.doctor?.doctorId) {
-        alert(`Registration successful! Your Doctor ID is: ${resp.doctor.doctorId}\nUse this ID or your email to login.`);
+      if (resp?.success) {
+        alert(`Registration successful!\nUse your email to login.`);
         navigate("/login");
       } else {
         setError(resp?.message || "Registration failed");

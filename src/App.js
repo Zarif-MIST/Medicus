@@ -6,8 +6,12 @@ import FeaturesSection from "./components/HomePage/FeaturesSection";
 import WhatWeDoSection from "./components/HomePage/WhatWeDoSection";
 import DoctorLoginPage from "./components/Doctorlog/Doctorlog";
 import RegistrationPage from "./components/Doctorreg/Doctorreg";
-import DoctorDashboardPage from "./components/Doctordash/Doctordash";
-import DoctorRecentPrescriptionsPage from "./components/Doctordash/Recentpes";
+import PatientRegistration from "./components/PatReg/PatRegistration";
+import PharmacistRegistration from "./components/PharmReg/PharmacistRegistration";
+import DoctorDashboardPage from "./components/DoctorDash/Doctordash";
+import PatientDashboard from "./components/PatDash/PatDash";
+import PharmacyDashboard from "./components/PharmDash/PharmDash";
+import DoctorRecentPrescriptionsPage from "./components/DoctorDash/Recentpes";
 import DiagnosisPage from "./components/Diagnosispage/Diagnosis";
 import { AuthProvider } from "./context/AuthContext";
 
@@ -29,9 +33,14 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<DoctorLoginPage />} />
           <Route path="/doctorlogin" element={<DoctorLoginPage />} />
           <Route path="/doctorreg" element={<RegistrationPage />} />
-          <Route path="/doctordash" element={<DoctorDashboardPage />} />
+          <Route path="/patientreg" element={<PatientRegistration />} />
+          <Route path="/pharmacyreg" element={<PharmacistRegistration />} />
+          <Route path="/doctordash/*" element={<DoctorDashboardPage />} />
+          <Route path="/dashboard/*" element={<PatientDashboard />} />
+          <Route path="/pharmacy/dashboard/*" element={<PharmacyDashboard />} />
           <Route path="/recentpes" element={<DoctorRecentPrescriptionsPage />} />
           <Route path="/diagnosis/:patientId" element={<DiagnosisPage />} />
         </Routes>

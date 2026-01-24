@@ -1,10 +1,10 @@
-// Use relative URLs so CRA proxy routes to backend at http://localhost:5001
-const API_BASE_URL = '/api';
+// Backend API base URL - make sure backend is running on 5000
+const API_BASE_URL = 'http://localhost:5000/api';
 
 export const apiService = {
   // Doctor APIs
   doctorRegister: async (doctorData) => {
-    const response = await fetch(`${API_BASE_URL}/doctors/register`, {
+    const response = await fetch(`${API_BASE_URL}/auth/register/doctor`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(doctorData),
@@ -13,16 +13,16 @@ export const apiService = {
   },
 
   doctorLogin: async (identifier, password) => {
-    const response = await fetch(`${API_BASE_URL}/doctors/login`, {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identifier, password }),
+      body: JSON.stringify({ username: identifier, password, role: 'Doctor' }),
     });
     return response.json();
   },
 
   doctorAdminLogin: async () => {
-    const response = await fetch(`${API_BASE_URL}/doctors/admin-login`, {
+    const response = await fetch(`${API_BASE_URL}/auth/doctors/admin-login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: 'admin', password: 'admin' }),
@@ -32,7 +32,7 @@ export const apiService = {
 
   // Patient APIs
   patientRegister: async (patientData) => {
-    const response = await fetch(`${API_BASE_URL}/patients/register`, {
+    const response = await fetch(`${API_BASE_URL}/auth/register/patient`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(patientData),
@@ -41,16 +41,16 @@ export const apiService = {
   },
 
   patientLogin: async (identifier, password) => {
-    const response = await fetch(`${API_BASE_URL}/patients/login`, {
+    const response = await fetch(`${API_BASE_URL}/auth/login-patient`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identifier, password }),
+      body: JSON.stringify({ email: identifier, password }),
     });
     return response.json();
   },
 
   patientAdminLogin: async () => {
-    const response = await fetch(`${API_BASE_URL}/patients/admin-login`, {
+    const response = await fetch(`${API_BASE_URL}/auth/patients/admin-login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: 'admin', password: 'admin' }),
@@ -60,7 +60,7 @@ export const apiService = {
 
   // Pharmacy APIs
   pharmacyRegister: async (pharmacyData) => {
-    const response = await fetch(`${API_BASE_URL}/pharmacies/register`, {
+    const response = await fetch(`${API_BASE_URL}/auth/register/pharmacist`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(pharmacyData),
@@ -69,16 +69,16 @@ export const apiService = {
   },
 
   pharmacyLogin: async (identifier, password) => {
-    const response = await fetch(`${API_BASE_URL}/pharmacies/login`, {
+    const response = await fetch(`${API_BASE_URL}/auth/login-pharmacist`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identifier, password }),
+      body: JSON.stringify({ email: identifier, password }),
     });
     return response.json();
   },
 
   pharmacyAdminLogin: async () => {
-    const response = await fetch(`${API_BASE_URL}/pharmacies/admin-login`, {
+    const response = await fetch(`${API_BASE_URL}/auth/pharmacies/admin-login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: 'admin', password: 'admin' }),
@@ -88,9 +88,13 @@ export const apiService = {
 
   // Patient lookup (for doctors)
   getPatientById: async (patientId) => {
+    const token = localStorage.getItem("medicus_token");
     const response = await fetch(`${API_BASE_URL}/patients/${patientId}`, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
     });
     const data = await response.json();
     if (!response.ok) {

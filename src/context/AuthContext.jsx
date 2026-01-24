@@ -4,10 +4,14 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [initializing, setInitializing] = useState(true);
 
-  // Load user from localStorage on mount
+  // Load user and token from localStorage on mount
   useEffect(() => {
     const savedUser = localStorage.getItem("medicus_user");
+    const savedToken = localStorage.getItem("medicus_token");
+    
     if (savedUser) {
       try {
         setUser(JSON.parse(savedUser));
@@ -16,6 +20,12 @@ export function AuthProvider({ children }) {
         localStorage.removeItem("medicus_user");
       }
     }
+    
+    if (savedToken) {
+      setToken(savedToken);
+    }
+    
+    setInitializing(false);
   }, []);
 
   const login = (username, role) => {
@@ -28,13 +38,23 @@ export function AuthProvider({ children }) {
     localStorage.setItem("medicus_user", JSON.stringify(userData));
   };
 
+  const setAuthToken = (newToken) => {
+    setToken(newToken);
+    if (newToken) {
+      localStorage.setItem("medicus_token", newToken);
+    }
+  };
+
   const logout = () => {
     setUser(null);
+    setToken(null);
     localStorage.removeItem("medicus_user");
+    localStorage.removeItem("medicus_token");
+    localStorage.removeItem("medicus_role");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, setAuthToken, logout, initializing }}>
       {children}
     </AuthContext.Provider>
   );
@@ -47,3 +67,4 @@ export function useAuth() {
   }
   return context;
 }
+

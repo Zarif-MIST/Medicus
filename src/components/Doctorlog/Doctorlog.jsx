@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "../../services/api";
+import { apiService } from "../../services/apiService";
 import "./Doctorlogin.css";
 import { useAuth } from "../../context/AuthContext";
 
@@ -8,7 +8,7 @@ const roles = ["Doctor", "Pharmacy", "Patient"];
 
 export default function DoctorLoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, setAuthToken } = useAuth();
 
   const [selectedRole, setSelectedRole] = useState("Patient");
   const [username, setUsername] = useState("");
@@ -33,11 +33,39 @@ export default function DoctorLoginPage() {
     setLoading(true);
 
     try {
-      // Call API to login from MongoDB
-      const result = await loginUser(username, password, selectedRole);
+      let result;
+      // Call appropriate API based on role
+      if (selectedRole === "Doctor") {
+        console.log("Attempting doctor login with:", username);
+        result = await apiService.doctorLogin(username, password);
+      } else if (selectedRole === "Pharmacy") {
+        console.log("Attempting pharmacy login with:", username);
+        result = await apiService.pharmacyLogin(username, password);
+      } else {
+        console.log("Attempting patient login with:", username);
+        result = await apiService.patientLogin(username, password);
+      }
+
+      console.log("API Response:", result);
+
+      // Check if login was successful
+      if (!result || (!result.success && !result.token)) {
+        const errorMsg = result?.message || "Invalid credentials. Please check your email and password.";
+        console.error("Login failed:", errorMsg);
+        setError(errorMsg);
+        setLoading(false);
+        return;
+      }
+
+      // Store auth data in localStorage and context
+      if (result.token) {
+        setAuthToken(result.token);
+        localStorage.setItem("medicus_role", selectedRole.toLowerCase());
+        localStorage.setItem("medicus_user", JSON.stringify(result.data || {}));
+      }
 
       // Update auth context with user data from database
-      login(result.data.fullName, selectedRole);
+      login(result.data?.fullName || result.doctor?.fullName || result.pharmacy?.pharmacyName || result.patient?.fullName || username, selectedRole);
 
       console.log("Login successful:", result);
 
@@ -47,8 +75,9 @@ export default function DoctorLoginPage() {
       else navigate("/dashboard");
 
     } catch (err) {
-      setError(err.message || "Login failed. Please check your credentials.");
+      const errorMessage = err.message || "Login failed. Please check your credentials.";
       console.error("Login error:", err);
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -58,9 +87,9 @@ export default function DoctorLoginPage() {
     e.preventDefault();
 
     // ✅ signup route based on role
-    if (selectedRole === "Doctor") navigate("/register/doctor");
-    else if (selectedRole === "Pharmacy") navigate("/register/pharmacy");
-    else navigate("/register/patient");
+    if (selectedRole === "Doctor") navigate("/doctorreg");
+    else if (selectedRole === "Pharmacy") navigate("/pharmacyreg");
+    else navigate("/patientreg");
   };
 
   return (

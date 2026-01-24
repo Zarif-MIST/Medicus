@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './styles/PharmacistRegister.css';
-import { useAuth } from '../../context/AuthContext';
+import { apiService } from '../../services/apiService';
 
 export default function PharmacistRegistration() {
   const navigate = useNavigate();
-  const { pharmacyRegister } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
@@ -36,20 +35,19 @@ export default function PharmacistRegistration() {
     }
 
     const payload = {
-      pharmacyName: formData.pharmacyName,
-      managerName: formData.fullName,
+      fullName: formData.fullName,
       email: formData.email,
+      phone: formData.phone,
+      pharmacyLicense: formData.licenseNumber,
       password: formData.password,
-      phoneNumber: formData.phone,
-      licenseNumber: formData.licenseNumber,
-      address: '',
+      pharmacy: formData.pharmacyName || '',
     };
 
     setSubmitting(true);
     try {
-      const resp = await pharmacyRegister(payload);
-      if (resp?.pharmacy?.pharmacyId) {
-        alert(`Registration successful!\n\nYour Pharmacy ID: ${resp.pharmacy.pharmacyId}\nUse this ID or your email to login.`);
+      const resp = await apiService.pharmacyRegister(payload);
+      if (resp?.success) {
+        alert(`Registration successful!\nUse your email to login.`);
         navigate('/login');
       } else {
         setError(resp?.message || 'Registration failed');

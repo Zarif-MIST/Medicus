@@ -2,11 +2,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../PatReg/styles/RegisterSection.css';
-import { useAuth } from '../../context/AuthContext';
+import { apiService } from '../../services/apiService';
 
 export default function RegisterSection() {
   const navigate = useNavigate();
-  const { patientRegister } = useAuth();
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -29,21 +28,17 @@ export default function RegisterSection() {
 
     const [firstName, ...rest] = fullName.trim().split(' ');
     const payload = {
-      firstName: firstName || fullName,
-      lastName: rest.join(' ') || '',
+      fullName,
       email,
+      phone,
       password,
-      phoneNumber: phone,
-      dateOfBirth: dob,
-      gender: '',
-      address: '',
     };
 
     setSubmitting(true);
     try {
-      const resp = await patientRegister(payload);
-      if (resp?.patient?.patientId) {
-        alert(`Registration successful!\n\nYour Patient ID: ${resp.patient.patientId}\nUse this ID or your email to login.`);
+      const resp = await apiService.patientRegister(payload);
+      if (resp?.success) {
+        alert(`Registration successful!\nUse your email to login.`);
         navigate('/login');
       } else {
         setError(resp?.message || 'Registration failed');

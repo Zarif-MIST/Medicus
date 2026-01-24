@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./DoctorLog.css";
+import { apiService } from "../../services/apiService";
 import { useAuth } from "../../context/AuthContext";
 
 const roles = ["Doctor", "Pharmacy", "Patient"];
 
 export default function DoctorLoginPage() {
   const navigate = useNavigate();
-  const { doctorLogin, patientLogin, pharmacyLogin, adminLogin, loading, error: authError } = useAuth();
+  const { login } = useAuth();
 
   const [selectedRole, setSelectedRole] = useState("Patient");
   const [username, setUsername] = useState("");
@@ -29,32 +30,31 @@ export default function DoctorLoginPage() {
     }
 
     try {
-      // Admin login
-      if (username === "admin" && password === "admin") {
-        const response = await adminLogin(selectedRole.toLowerCase());
-        if (response?.token) {
-          if (selectedRole === "Doctor") navigate("/doctor-dashboard");
-          else if (selectedRole === "Patient") navigate("/dashboard");
-          else navigate("/pharmacy-dashboard");
-        } else {
-          setError(response?.message || "Admin login failed");
-        }
-        return;
-      }
-
       // Role-specific login via API
       if (selectedRole === "Doctor") {
-        const resp = await doctorLogin(username, password);
-        if (resp?.token) navigate("/doctor-dashboard");
-        else setError(resp?.message || "Invalid Doctor credentials");
+        const resp = await apiService.doctorLogin(username, password);
+        if (resp?.token) {
+          login(resp.doctor?.firstName || username, "Doctor");
+          navigate("/doctor-dashboard");
+        } else {
+          setError(resp?.message || "Invalid Doctor credentials");
+        }
       } else if (selectedRole === "Patient") {
-        const resp = await patientLogin(username, password);
-        if (resp?.token) navigate("/dashboard");
-        else setError(resp?.message || "Invalid Patient credentials");
+        const resp = await apiService.patientLogin(username, password);
+        if (resp?.token) {
+          login(resp.patient?.firstName || username, "Patient");
+          navigate("/dashboard");
+        } else {
+          setError(resp?.message || "Invalid Patient credentials");
+        }
       } else if (selectedRole === "Pharmacy") {
-        const resp = await pharmacyLogin(username, password);
-        if (resp?.token) navigate("/pharmacy-dashboard");
-        else setError(resp?.message || "Invalid Pharmacy credentials");
+        const resp = await apiService.pharmacyLogin(username, password);
+        if (resp?.token) {
+          login(resp.pharmacy?.pharmacyName || username, "Pharmacy");
+          navigate("/pharmacy-dashboard");
+        } else {
+          setError(resp?.message || "Invalid Pharmacy credentials");
+        }
       }
     } catch (err) {
       setError(err.message || "Login failed");

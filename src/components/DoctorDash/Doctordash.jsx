@@ -33,9 +33,9 @@ export default function DoctorDashboardPage() {
     setSearching(true);
     try {
       const response = await apiService.getPatientById(id);
-      if (response.patient) {
-        // Patient found, navigate to diagnosis page
-        navigate(`/doctor/diagnosis/${encodeURIComponent(id)}`);
+      if (response.success && response.data) {
+        // Patient found, navigate to diagnosis page with patient ID
+        navigate(`/diagnosis/${encodeURIComponent(id)}`);
       } else {
         setSearchError(response.message || "Patient not found");
       }
@@ -73,7 +73,7 @@ export default function DoctorDashboardPage() {
 
               <div className="dash-hero-text">
                 <h1>
-                  Welcome Back, Dr. {user.firstName || user.email || ""}
+                  Welcome Back, Dr. {user?.username || ""}
                 </h1>
                 <p>Access patient data, create diagnoses, and manage prescriptions</p>
               </div>
