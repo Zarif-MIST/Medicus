@@ -8,12 +8,17 @@ export default function PharmacistRegistration() {
   const { pharmacyRegister } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [locationError, setLocationError] = useState('');
+  const [locationLoading, setLocationLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
     pharmacyName: '',
     licenseNumber: '',
+    address: '',
+    latitude: null,
+    longitude: null,
     password: '',
     confirmPassword: '',
   });
@@ -24,6 +29,39 @@ export default function PharmacistRegistration() {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleCaptureLocation = () => {
+    setLocationError('');
+    setLocationLoading(true);
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setFormData((prev) => ({
+            ...prev,
+            latitude: parseFloat(latitude.toFixed(6)),
+            longitude: parseFloat(longitude.toFixed(6)),
+          }));
+          setLocationError('');
+          setLocationLoading(false);
+        },
+        (error) => {
+          setLocationLoading(false);
+          if (error.code === error.PERMISSION_DENIED) {
+            setLocationError('Location permission denied. Please enable location access.');
+          } else if (error.code === error.POSITION_UNAVAILABLE) {
+            setLocationError('Location unavailable. Please try again.');
+          } else {
+            setLocationError('Error getting location. Please try again.');
+          }
+        }
+      );
+    } else {
+      setLocationLoading(false);
+      setLocationError('Geolocation is not supported by your browser.');
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -42,7 +80,9 @@ export default function PharmacistRegistration() {
       password: formData.password,
       phoneNumber: formData.phone,
       licenseNumber: formData.licenseNumber,
-      address: '',
+      address: formData.address,
+      latitude: formData.latitude,
+      longitude: formData.longitude,
     };
 
     setSubmitting(true);
@@ -139,6 +179,48 @@ export default function PharmacistRegistration() {
               onChange={handleChange}
               required
             />
+            <textarea
+              name="address"
+              placeholder="Pharmacy address (street address, city, postal code)"
+              value={formData.address}
+              onChange={handleChange}
+              rows="3"
+              required
+              style={{ fontFamily: 'inherit', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '16px', resize: 'vertical' ,width: '100%'}}
+            />
+
+            <div style={{ marginBottom: '15px' }}>
+              <button
+                type="button"
+                onClick={handleCaptureLocation}
+                disabled={locationLoading}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: formData.latitude && formData.longitude ? '#10b981' : '#991b1b',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: locationLoading ? 'wait' : 'pointer',
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                {locationLoading ? ' Getting Location...' : formData.latitude && formData.longitude ? '✅ Location Captured' : '📍 Capture Pharmacy Location'}
+              </button>
+              {locationError && (
+                <div style={{ color: '#991b1b', fontSize: '13px', marginTop: '8px', padding: '8px', backgroundColor: '#fef2f2', borderRadius: '6px' }}>
+                  ⚠️ {locationError}
+                </div>
+              )}
+              {formData.latitude && formData.longitude && (
+                <div style={{ color: '#10b981', fontSize: '13px', marginTop: '8px', padding: '8px', backgroundColor: '#f0fdf4', borderRadius: '6px' }}>
+                   Location: {formData.latitude}, {formData.longitude}
+                </div>
+              )}
+            </div>
+
             <input
               type="password"
               name="password"

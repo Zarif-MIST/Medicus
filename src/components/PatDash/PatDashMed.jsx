@@ -2,18 +2,53 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './PatDash.css';
+import { useAuth } from '../../context/AuthContext';
+import { apiService } from '../../services/apiService';
 
 export default function PatientMedicalRecordsDashboard() {
-  const [patientName, setPatientName] = useState('');
   const navigate = useNavigate();
+  const { user, initializing } = useAuth();
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
+  // Redirect if not authenticated as patient
   useEffect(() => {
-    // Retrieve the patient's name from localStorage
-    const name = localStorage.getItem('patientName');
-    if (name) {
-      setPatientName(name);
+    if (initializing) return;
+    const role = localStorage.getItem("medicus_role");
+    if (!user || role !== "patient") {
+      navigate("/login");
     }
-  }, []);
+  }, [user, navigate, initializing]);
+
+  // Fetch patient prescriptions for medical history
+  useEffect(() => {
+    const fetchPrescriptions = async () => {
+      if (!user?.id) return;
+      try {
+        setLoading(true);
+        const response = await apiService.getPrescriptionsByPatient(user.id);
+        setPrescriptions(response.prescriptions || []);
+        setError('');
+      } catch (err) {
+        setError('Failed to load medical records');
+        setPrescriptions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!initializing && user?.id) {
+      fetchPrescriptions();
+    }
+  }, [user, initializing]);
+
+  if (initializing || !user) {
+    return null;
+  }
+
+  const patientName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+  const activePrescriptionCount = prescriptions.filter(rx => rx.status === 'Active').length;
 
   return (
     <div className="dashboard">
@@ -30,11 +65,11 @@ export default function PatientMedicalRecordsDashboard() {
       {/* Top Summary Cards */}
       <div className="summary-cards">
         <div className="summary-card">
-          <div className="summary-icon visits">15</div>
-          <div className="summary-label">Medical Visits</div>
+          <div className="summary-icon visits">{prescriptions.length}</div>
+          <div className="summary-label">Total Prescriptions</div>
         </div>
         <div className="summary-card">
-          <div className="summary-icon prescriptions">3</div>
+          <div className="summary-icon prescriptions">{activePrescriptionCount}</div>
           <div className="summary-label">Active Prescriptions</div>
         </div>
       </div>
@@ -53,33 +88,23 @@ export default function PatientMedicalRecordsDashboard() {
           <div className="section-header">
             <h3>Medical Records</h3>
           </div>
-
-          {/* Record 1 */}
-          <div className="history-item">
-            <div>
-              <strong>Upper Respiratory Infection</strong><br />
-              Dr. Anderson • Consultation
-            </div>
-            <div className="date">2024-12-18</div>
-          </div>
-
-          {/* Record 2 */}
-          <div className="history-item">
-            <div>
-              <strong>Annual Physical Exam</strong><br />
-              Dr. Williams • Check-up
-            </div>
-            <div className="date">2024-11-05</div>
-          </div>
-
-          {/* Record 3 */}
-          <div className="history-item">
-            <div>
-              <strong>Allergic Reaction</strong><br />
-              Dr. Brown • Consultation
-            </div>
-            <div className="date">2024-09-12</div>
-          </div>
+          {loading ? (
+            <div style={{ padding: '20px', textAlign: 'center' }}>Loading records...</div>
+          ) : error ? (
+            <div style={{ padding: '20px', color: '#991b1b' }}>{error}</div>
+          ) : prescriptions.length > 0 ? (
+            prescriptions.map((rx) => (
+              <div key={rx._id} className="history-item">
+                <div>
+                  <strong>{rx.diagnosis || 'Medical Consultation'}</strong><br />
+                  Dr. {rx.doctorId?.firstName || 'Unknown'} {rx.doctorId?.lastName || ''} • {rx.status}
+                </div>
+                <div className="date">{new Date(rx.issuedDate).toLocaleDateString()}</div>
+              </div>
+            ))
+          ) : (
+            <div style={{ padding: '20px', color: '#666' }}>No medical records found</div>
+          )}
         </div>
 
         {/* Health Tips */}

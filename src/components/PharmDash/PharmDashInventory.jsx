@@ -117,8 +117,39 @@ export default function PharmDashInventory() {
       setError('');
       setSuccess('');
       
-      // Update the medicine quantity
-      await apiService.updateMedicineQuantity(editData.id, parseInt(editData.quantity, 10), 'restock');
+<<<<<<< HEAD
+      // Find current item to calculate the actual quantity change
+      const currentItem = inventory.find((item) => item._id === editData.id);
+      if (!currentItem) {
+        throw new Error('Item not found');
+      }
+
+      const newQuantity = parseInt(editData.quantity, 10);
+      const currentQuantity = parseInt(currentItem.quantity, 10);
+      const quantityChange = newQuantity - currentQuantity;
+
+      // Only update quantity if there's a change
+      if (quantityChange !== 0) {
+        const action = quantityChange > 0 ? 'restock' : 'dispense';
+        await apiService.updateMedicineQuantity(editData.id, Math.abs(quantityChange), action);
+      }
+=======
+      // Find current item to calculate the actual quantity change
+      const currentItem = inventory.find((item) => item._id === editData.id);
+      if (!currentItem) {
+        throw new Error('Item not found');
+      }
+      
+      const newQuantity = parseInt(editData.quantity, 10);
+      const currentQuantity = parseInt(currentItem.quantity, 10);
+      const quantityChange = newQuantity - currentQuantity;
+      
+      // Only update quantity if there's a change
+      if (quantityChange !== 0) {
+        const action = quantityChange > 0 ? 'restock' : 'dispense';
+        await apiService.updateMedicineQuantity(editData.id, Math.abs(quantityChange), action);
+      }
+>>>>>>> 7624a861 (Update dashboards, prescription flow, map fixes, and API handling)
       
       setInventory((prev) => prev.map((item) => {
         if (item._id === editData.id) {
@@ -126,7 +157,7 @@ export default function PharmDashInventory() {
             ...item,
             medicineName: editData.medicineName.trim(),
             strength: editData.strength.trim(),
-            quantity: parseInt(editData.quantity, 10),
+            quantity: newQuantity,
             price: parseFloat(editData.price),
             expiryDate: editData.expiryDate,
             batchNumber: editData.batchNumber.trim(),
@@ -284,7 +315,7 @@ export default function PharmDashInventory() {
                         </div>
                         <div className="detail-col">
                           <div className="detail-label">Price</div>
-                          <div className="detail-value">₹{item.price.toFixed(2)}</div>
+                          <div className="detail-value">BDT{item.price.toFixed(2)}</div>
                         </div>
                         <div className="detail-col">
                           <div className="detail-label">Batch</div>
@@ -349,7 +380,7 @@ export default function PharmDashInventory() {
               </div>
 
               <div className="form-group">
-                <label>Price per Unit (₹) *</label>
+                <label>Price per Unit (BDT) *</label>
                 <input
                   type="number"
                   placeholder="Enter price"
@@ -448,7 +479,7 @@ export default function PharmDashInventory() {
               </div>
 
               <div className="form-group">
-                <label>Price per Unit (₹) *</label>
+                <label>Price per Unit (BDT) *</label>
                 <input
                   type="number"
                   value={editData.price}

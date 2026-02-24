@@ -2,18 +2,53 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './PatDash.css';
+import { useAuth } from '../../context/AuthContext';
+import { apiService } from '../../services/apiService';
 
 export default function PatientPrescriptionsDashboard() {
-  const [patientName, setPatientName] = useState('');
   const navigate = useNavigate();
+  const { user, initializing } = useAuth();
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
+  // Redirect if not authenticated as patient
   useEffect(() => {
-    // Retrieve the patient's name from localStorage
-    const name = localStorage.getItem('patientName');
-    if (name) {
-      setPatientName(name);
+    if (initializing) return;
+    const role = localStorage.getItem("medicus_role");
+    if (!user || role !== "patient") {
+      navigate("/login");
     }
-  }, []);
+  }, [user, navigate, initializing]);
+
+  // Fetch patient prescriptions
+  useEffect(() => {
+    const fetchPrescriptions = async () => {
+      if (!user?.id) return;
+      try {
+        setLoading(true);
+        const response = await apiService.getPrescriptionsByPatient(user.id);
+        setPrescriptions(response.prescriptions || []);
+        setError('');
+      } catch (err) {
+        setError('Failed to load prescriptions');
+        setPrescriptions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!initializing && user?.id) {
+      fetchPrescriptions();
+    }
+  }, [user, initializing]);
+
+  if (initializing || !user) {
+    return null;
+  }
+
+  const patientName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+  const activePrescriptionCount = prescriptions.filter(rx => rx.status === 'Active').length;
 
   return (
     <div className="dashboard">
@@ -30,11 +65,11 @@ export default function PatientPrescriptionsDashboard() {
       {/* Top Summary Cards */}
       <div className="summary-cards">
         <div className="summary-card">
-          <div className="summary-icon visits">15</div>
-          <div className="summary-label">Medical Visits</div>
+          <div className="summary-icon visits">{prescriptions.length}</div>
+          <div className="summary-label">Total Prescriptions</div>
         </div>
         <div className="summary-card">
-          <div className="summary-icon prescriptions">3</div>
+          <div className="summary-icon prescriptions">{activePrescriptionCount}</div>
           <div className="summary-label">Active Prescriptions</div>
         </div>
       </div>
@@ -53,44 +88,45 @@ export default function PatientPrescriptionsDashboard() {
           <div className="section-header">
             <h3>All Prescriptions</h3>
           </div>
-
-          {/* Active Prescription */}
-          <div className="prescription-item">
-            <div className="prescription-name">Amoxicillin 500mg</div>
-            <div className="prescription-doctor">Prescribed by Dr. Anis</div>
-            <div className="prescription-details">
-              <div>
-                <strong>Dosage</strong><br />
-                3 times daily
+          {loading ? (
+            <div style={{ padding: '20px', textAlign: 'center' }}>Loading prescriptions...</div>
+          ) : error ? (
+            <div style={{ padding: '20px', color: '#991b1b' }}>{error}</div>
+          ) : prescriptions.length > 0 ? (
+            prescriptions.map((rx) => (
+              <div key={rx._id}>
+                {rx.medicines && rx.medicines.map((med, idx) => (
+                  <div key={idx} className="prescription-item">
+                    <div className="prescription-name">{med.medicineName} ({med.dosage})</div>
+                    <div className="prescription-doctor">
+                      Prescribed by Dr. {rx.doctorId?.firstName || 'Unknown'} {rx.doctorId?.lastName || ''} • {rx.status}
+                    </div>
+                    <div className="prescription-details">
+                      <div>
+                        <strong>Dosage</strong><br />
+                        {med.dosage}
+                      </div>
+                      <div>
+                        <strong>Frequency</strong><br />
+                        {med.frequency}
+                      </div>
+                      <div>
+                        <strong>Duration</strong><br />
+                        {med.duration}
+                      </div>
+                    </div>
+                    {med.instructions && (
+                      <div className="prescription-instructions">
+                        Instructions: {med.instructions}
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-              <div>
-                <strong>Duration</strong><br />
-                7 days
-              </div>
-            </div>
-            <div className="prescription-instructions">
-              Instructions: Take with food
-            </div>
-          </div>
-
-          {/* Completed Prescription */}
-          <div className="prescription-item">
-            <div className="prescription-name">Ibuprofen 400mg</div>
-            <div className="prescription-doctor">Prescribed by Dr. Basit</div>
-            <div className="prescription-details">
-              <div>
-                <strong>Dosage</strong><br />
-                As needed
-              </div>
-              <div>
-                <strong>Duration</strong><br />
-                14 days
-              </div>
-            </div>
-            <div className="prescription-instructions">
-              Instructions: Take after meals
-            </div>
-          </div>
+            ))
+          ) : (
+            <div style={{ padding: '20px', color: '#666' }}>No prescriptions found</div>
+          )}
         </div>
 
         {/* Health Tips */}

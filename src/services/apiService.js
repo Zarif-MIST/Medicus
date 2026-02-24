@@ -119,6 +119,9 @@ export const apiService = {
       headers: { 'Content-Type': 'application/json' },
     });
     const data = await response.json();
+    if (response.status === 404) {
+      return { message: data.message || 'No prescriptions found for this patient', prescriptions: [] };
+    }
     if (!response.ok) {
       throw new Error(data.message || 'Failed to fetch prescriptions');
     }
@@ -191,5 +194,18 @@ export const apiService = {
       headers: { 'Content-Type': 'application/json' },
     });
     return response.json();
+  },
+
+  // Get all pharmacies (for pharmacy locator)
+  getAllPharmacies: async () => {
+    const response = await fetch(`${API_BASE_URL}/pharmacies`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch pharmacies');
+    }
+    return data;
   },
 };

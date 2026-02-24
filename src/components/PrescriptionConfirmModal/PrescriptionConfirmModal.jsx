@@ -33,13 +33,22 @@ export default function PrescriptionConfirmModal({
 
           <div className="confirm-section">
             <h3>Prescribed Medicines ({medicines.length})</h3>
+            <p className="prescription-note">
+              📅 Prescription starts from today ({new Date().toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric' 
+              })})
+            </p>
             {medicines.length > 0 ? (
               <ul>
                 {medicines.map((med) => (
                   <li key={med.id}>
                     <strong>{med.name}</strong> - {med.dosage}
                     <br />
-                    Qty: {med.quantity} | Frequency: {med.frequency} | Duration: {med.duration}
+                    <span className="med-details-line">
+                      Qty: {med.quantity} | Frequency: {med.frequency} | Duration: {med.duration}
+                    </span>
                   </li>
                 ))}
               </ul>

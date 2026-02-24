@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./Diagnosisstyle.css";
 import PrescriptionConfirmModal from "../PrescriptionConfirmModal/PrescriptionConfirmModal";
@@ -143,15 +143,8 @@ export default function DiagnosisPage() {
       if (response.prescription) {
         setShowConfirmModal(false);
         alert(`Prescription saved successfully!\nPrescription ID: ${response.prescription.prescriptionId}`);
-        // Navigate to pharmacist page
-        navigate("/doctor/pharmacy-dashboard", {
-          state: {
-            patientId: patient.patientId,
-            diagnosis: diagnosisText,
-            medicines,
-            prescriptionId: response.prescription.prescriptionId,
-          },
-        });
+        // Navigate back to doctor dashboard
+        navigate("/doctor-dashboard");
       } else {
         setSubmitError(response.message || "Failed to save prescription");
       }
@@ -298,7 +291,7 @@ export default function DiagnosisPage() {
                   name="dosage"
                   value={medForm.dosage}
                   onChange={onMedFormChange}
-                  placeholder="Dosage"
+                  placeholder="Dosage (e.g., 500mg)"
                   className="med-input"
                 />
                 <input
@@ -307,22 +300,26 @@ export default function DiagnosisPage() {
                   onChange={onMedFormChange}
                   placeholder="Quantity"
                   className="med-input"
+                  type="number"
                 />
                 <input
                   name="frequency"
                   value={medForm.frequency}
                   onChange={onMedFormChange}
-                  placeholder="Frequency"
+                  placeholder="Frequency (e.g., 2 times/day)"
                   className="med-input"
                 />
                 <input
                   name="duration"
                   value={medForm.duration}
                   onChange={onMedFormChange}
-                  placeholder="Duration"
+                  placeholder="Duration (e.g., 7 days)"
                   className="med-input"
                 />
               </div>
+              <p className="form-helper-text">
+                💡 Duration starts from today. Example: "7 days", "2 weeks", "1 month"
+              </p>
 
               <div className="med-form-actions">
                 <button 

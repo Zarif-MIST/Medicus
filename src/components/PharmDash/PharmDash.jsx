@@ -2,22 +2,37 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './PharmDash.css';
 import { useAuth } from '../../context/AuthContext';
+import { apiService } from '../../services/apiService';
 
 export default function PharmDash() {
   const navigate = useNavigate();
   const { user, initializing } = useAuth();
   const [inventory, setInventory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Load inventory - must be called before any conditional returns
+  // Load inventory from API
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('pharmacyInventory');
-      const parsed = stored ? JSON.parse(stored) : [];
-      if (Array.isArray(parsed)) setInventory(parsed);
-    } catch (err) {
-      // ignore parse errors
+    const fetchInventory = async () => {
+      try {
+        setLoading(true);
+        const data = await apiService.getPharmacyInventory(user.id);
+        setInventory(data.inventory || []);
+        setError('');
+      } catch (err) {
+        setError('Failed to load inventory');
+        setInventory([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!initializing && user?.id) {
+      fetchInventory();
+    } else if (!initializing) {
+      setLoading(false);
     }
-  }, []);
+  }, [user, initializing]);
 
   // Redirect to login if not authenticated
   React.useEffect(() => {
@@ -33,31 +48,46 @@ export default function PharmDash() {
   }
 
   const totalMedicines = inventory.length;
-  const lowStockCount = inventory.filter((item) => item.status === 'Low Stock').length;
-  const expiringCount = inventory.filter((item) => item.status === 'Expiring Soon').length;
+  const totalUnits = inventory.reduce((sum, item) => {
+    const qty = Number(item.quantity);
+    return sum + (Number.isNaN(qty) ? 0 : qty);
+  }, 0);
+  const lowStockCount = inventory.filter((item) => {
+    const reorderLevel = Number(item.reorderLevel) || 0;
+    const quantity = Number(item.quantity) || 0;
+    return reorderLevel > 0 && quantity < reorderLevel;
+  }).length;
+
+  const expiringCount = inventory.filter((item) => {
+    if (!item.expiryDate) return false;
+    const expiry = new Date(item.expiryDate);
+    if (Number.isNaN(expiry.getTime())) return false;
+    const daysToExpiry = (expiry - new Date()) / (1000 * 60 * 60 * 24);
+    return daysToExpiry <= 60;
+  }).length;
 
   const stats = [
     {
-      label: 'Prescriptions',
-      value: '24',
-      status: 'Pending',
-      tone: 'accent',
-      icon: (
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="3" y="3" width="18" height="18" rx="4" />
-          <path d="M8 8h8M8 12h8M8 16h5" />
-        </svg>
-      ),
-    },
-    {
       label: 'Medicines',
       value: String(totalMedicines),
-      status: 'Total',
+      status: 'Items',
       tone: 'dark',
       icon: (
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <rect x="3" y="3" width="18" height="18" rx="4" />
           <path d="M9 3v18M3 9h18" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Total Units',
+      value: String(totalUnits),
+      status: 'In store',
+      tone: 'accent',
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="4" />
+          <path d="M3 9h18M9 21V9" />
         </svg>
       ),
     },
@@ -109,6 +139,8 @@ export default function PharmDash() {
         </header>
 
         <div className="pharm-stats">
+          {error && <div className="pharm-error">{error}</div>}
+          {loading && <div className="pharm-loading">Loading inventory...</div>}
           {stats.map((card) => (
             <div key={card.label} className={`pharm-card stat-card ${card.tone}`}>
               <div className="stat-icon">{card.icon}</div>

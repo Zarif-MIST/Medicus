@@ -476,7 +476,7 @@
 
 .search-btn {
   padding: 10px 16px;
-  background: #2563eb;
+  background: #ac1313;
   color: white;
   border: none;
   border-radius: 8px;
@@ -489,7 +489,7 @@
 }
 
 .search-btn:hover {
-  background: #1d4ed8;
+  background: #92140c;
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
@@ -523,12 +523,31 @@
   justify-content: space-between;
   align-items: center;
   background: #f9fafb;
+  transition: all 0.3s ease;
+}
+
+.medicine-card.dispensed {
+  background: #f0fdf4;
+  border-color: #86efac;
+  opacity: 0.7;
 }
 
 .med-name {
   font-weight: 600;
   color: #1f2937;
   margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dispensed-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #059669;
+  background: #d1fae5;
+  padding: 2px 8px;
+  border-radius: 12px;
 }
 
 .med-details {
@@ -551,9 +570,15 @@
   transition: all 0.2s ease;
 }
 
-.dispense-btn:hover {
+.dispense-btn:hover:not(:disabled) {
   background: #059669;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.dispense-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 @media (max-width: 1024px) {

@@ -13,10 +13,11 @@ export default function PharmDashPres() {
   const [showModal, setShowModal] = useState(false);
   const [selectedRx, setSelectedRx] = useState(null);
   const [dispensingMedicine, setDispensingMedicine] = useState(null);
-  const [dispensingQuantity, setDispensingQuantity] = useState('');
+  const [calculatedQuantity, setCalculatedQuantity] = useState(0);
   const [dispensingError, setDispensingError] = useState('');
   const [dispensingLoading, setDispensingLoading] = useState(false);
   const [inventory, setInventory] = useState([]);
+  const [dispensedMedicines, setDispensedMedicines] = useState({});
 
   // Redirect to login if not authenticated
   React.useEffect(() => {
@@ -64,12 +65,12 @@ export default function PharmDashPres() {
   };
 
   const handleDispenseMedicine = async () => {
-    if (!dispensingQuantity || parseInt(dispensingQuantity) <= 0) {
-      setDispensingError('Please enter a valid quantity');
+    if (!calculatedQuantity || calculatedQuantity <= 0) {
+      setDispensingError('Invalid quantity calculated from prescription');
       return;
     }
 
-    const quantityNeeded = parseInt(dispensingQuantity, 10);
+    const quantityNeeded = calculatedQuantity;
 
     // Check if medicine exists in inventory
     const medicineInStock = inventory.find(
@@ -103,9 +104,37 @@ export default function PharmDashPres() {
         )
       );
 
-      alert(`Dispensed ${quantityNeeded} units of ${dispensingMedicine.medicineName}`);
+      // Mark medicine as dispensed for this prescription
+      const prescriptionId = selectedRx.prescriptionId;
+      const medicineKey = `${prescriptionId}_${dispensingMedicine.medicineName}`;
+      
+      setDispensedMedicines(prev => ({
+        ...prev,
+        [medicineKey]: true
+      }));
+
+      // Check if all medicines are now dispensed
+      const allDispensed = selectedRx.medicines.every(med => {
+        const key = `${prescriptionId}_${med.medicineName}`;
+        return key === medicineKey || dispensedMedicines[key];
+      });
+
+      if (allDispensed) {
+        // Update prescription status to Dispensed
+        await apiService.updatePrescriptionStatus(prescriptionId, 'Dispensed');
+        
+        // Remove prescription from list
+        setPrescriptions(prev => prev.filter(p => p.prescriptionId !== prescriptionId));
+        
+        alert(`All medicines dispensed! Prescription ${prescriptionId} is now complete.`);
+        setShowModal(false);
+        setSelectedRx(null);
+      } else {
+        alert(`Dispensed ${quantityNeeded} units of ${dispensingMedicine.medicineName}`);
+      }
+      
       setDispensingMedicine(null);
-      setDispensingQuantity('');
+      setCalculatedQuantity(0);
     } catch (error) {
       setDispensingError(error.message || 'Failed to dispense medicine');
     } finally {
@@ -113,10 +142,92 @@ export default function PharmDashPres() {
     }
   };
 
+  const calculateQuantityFromDuration = (duration, frequency) => {
+    // Simple calculation: extract number from duration and frequency
+    const durationMatch = duration.match(/\d+/);
+    const frequencyMatch = frequency.match(/\d+/);
+    
+    const days = durationMatch ? parseInt(durationMatch[0]) : 7;
+    const timesPerDay = frequencyMatch ? parseInt(frequencyMatch[0]) : 1;
+    
+    return days * timesPerDay;
+  };
+
   const handleOpenPrescription = (rx) => {
     setSelectedRx(rx);
     setShowModal(true);
   };
+
+  // Calculate stats from inventory
+  const totalMedicines = inventory.length;
+  const totalUnits = inventory.reduce((sum, item) => {
+    const qty = Number(item.quantity);
+    return sum + (Number.isNaN(qty) ? 0 : qty);
+  }, 0);
+  const lowStockCount = inventory.filter((item) => {
+    const reorderLevel = Number(item.reorderLevel) || 0;
+    const quantity = Number(item.quantity) || 0;
+    return reorderLevel > 0 && quantity < reorderLevel;
+  }).length;
+  const expiringCount = inventory.filter((item) => {
+    if (!item.expiryDate) return false;
+    const expiry = new Date(item.expiryDate);
+    if (Number.isNaN(expiry.getTime())) return false;
+    const daysToExpiry = (expiry - new Date()) / (1000 * 60 * 60 * 24);
+    return daysToExpiry <= 60;
+  }).length;
+
+  const stats = [
+    {
+      label: 'Medicines',
+      value: String(totalMedicines),
+      status: 'Items',
+      tone: 'dark',
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="4" />
+          <path d="M9 3v18M3 9h18" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Total Units',
+      value: String(totalUnits),
+      status: 'In store',
+      tone: 'accent',
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="4" />
+          <path d="M3 9h18M9 21V9" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Low Stock',
+      value: String(lowStockCount),
+      status: 'Alert',
+      tone: 'warning',
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Expiring Soon',
+      value: String(expiringCount),
+      status: 'Warning',
+      tone: 'alert',
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5l3 2" />
+        </svg>
+      ),
+    },
+  ];
 
   return (
     <section className="pharm-page">
@@ -125,6 +236,19 @@ export default function PharmDashPres() {
           <h1>Prescriptions</h1>
           <p>Manage and process patient prescriptions</p>
         </header>
+
+        <div className="pharm-stats">
+          {stats.map((card) => (
+            <div key={card.label} className={`pharm-card stat-card ${card.tone}`}>
+              <div className="stat-icon">{card.icon}</div>
+              <div className="stat-meta">
+                <div className="stat-value">{card.value}</div>
+                <div className="stat-label">{card.label}</div>
+              </div>
+              <div className="stat-status">{card.status}</div>
+            </div>
+          ))}
+        </div>
 
         <div className="pharm-tabs">
           <button className="tab" onClick={() => navigate('/pharmacy-dashboard')}>Overview</button>
@@ -219,22 +343,36 @@ export default function PharmDashPres() {
                 <label>Prescribed Medicines</label>
                 <div className="medicines-list">
                   {selectedRx.medicines && selectedRx.medicines.length > 0 ? (
-                    selectedRx.medicines.map((med, idx) => (
-                      <div key={idx} className="medicine-card">
-                        <div className="med-name">{med.medicineName}</div>
-                        <div className="med-details">
-                          <span>Dosage: {med.dosage}</span>
-                          <span>Frequency: {med.frequency}</span>
-                          <span>Duration: {med.duration}</span>
+                    selectedRx.medicines.map((med, idx) => {
+                      const medicineKey = `${selectedRx.prescriptionId}_${med.medicineName}`;
+                      const isDispensed = dispensedMedicines[medicineKey];
+                      
+                      return (
+                        <div key={idx} className={`medicine-card ${isDispensed ? 'dispensed' : ''}`}>
+                          <div className="med-name">
+                            {med.medicineName}
+                            {isDispensed && <span className="dispensed-badge">✓ Dispensed</span>}
+                          </div>
+                          <div className="med-details">
+                            <span>Dosage: {med.dosage}</span>
+                            <span>Frequency: {med.frequency}</span>
+                            <span>Duration: {med.duration}</span>
+                          </div>
+                          <button 
+                            className="dispense-btn"
+                            onClick={() => {
+                              setDispensingMedicine(med);
+                              // Calculate quantity from duration (simple estimation)
+                              const qty = calculateQuantityFromDuration(med.duration, med.frequency);
+                              setCalculatedQuantity(qty);
+                            }}
+                            disabled={isDispensed}
+                          >
+                            {isDispensed ? 'Dispensed' : 'Dispense'}
+                          </button>
                         </div>
-                        <button 
-                          className="dispense-btn"
-                          onClick={() => setDispensingMedicine(med)}
-                        >
-                          Dispense
-                        </button>
-                      </div>
-                    ))
+                      );
+                    })
                   ) : (
                     <p>No medicines in this prescription</p>
                   )}
@@ -269,14 +407,26 @@ export default function PharmDashPres() {
               </div>
 
               <div className="field">
-                <label>Quantity to Dispense</label>
+                <label>Frequency</label>
+                <input value={dispensingMedicine.frequency} readOnly />
+              </div>
+
+              <div className="field">
+                <label>Duration</label>
+                <input value={dispensingMedicine.duration} readOnly />
+              </div>
+
+              <div className="field">
+                <label>Quantity to Dispense (Auto-calculated)</label>
                 <input
                   type="number"
-                  min="1"
-                  value={dispensingQuantity}
-                  onChange={(e) => setDispensingQuantity(e.target.value)}
-                  placeholder="Enter quantity"
+                  value={calculatedQuantity}
+                  readOnly
+                  style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
                 />
+                <small style={{ color: '#666', fontSize: '13px', marginTop: '4px', display: 'block' }}>
+                  Calculated from prescription: {dispensingMedicine.frequency} for {dispensingMedicine.duration}
+                </small>
               </div>
 
               {dispensingError && <div className="error-message">{dispensingError}</div>}

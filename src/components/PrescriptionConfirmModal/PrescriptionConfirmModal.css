@@ -60,6 +60,17 @@
   font-size: 14px;
 }
 
+.prescription-note {
+  background: #d1fae5;
+  color: #059669;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border-left: 3px solid #059669;
+  margin: 10px 0 !important;
+}
+
 .confirm-section ul {
   list-style: none;
   padding: 0;
@@ -74,6 +85,11 @@
   border-radius: 4px;
   font-size: 14px;
   color: #333;
+}
+
+.med-details-line {
+  color: #666;
+  font-size: 13px;
 }
 
 .modal-footer {
