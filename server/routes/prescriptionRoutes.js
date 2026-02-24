@@ -79,8 +79,8 @@ router.get('/patient/:patientId', async (req, res) => {
 
     // Check if it's a valid MongoDB ObjectId format (24 hex characters)
     if (patientId.match(/^[0-9a-fA-F]{24}$/)) {
-      // Try to find by MongoDB ID
-      prescriptions = await Prescription.find({ patientId })
+      // Try to find by MongoDB ID - only Active prescriptions for pharmacy
+      prescriptions = await Prescription.find({ patientId, status: 'Active' })
         .populate('doctorId', 'firstName lastName email doctorId')
         .populate('patientId', 'firstName lastName email patientId')
         .sort({ issuedDate: -1 });
@@ -93,7 +93,7 @@ router.get('/patient/:patientId', async (req, res) => {
       const patient = await Patient.findOne({ patientId });
       
       if (patient) {
-        prescriptions = await Prescription.find({ patientId: patient._id })
+        prescriptions = await Prescription.find({ patientId: patient._id, status: 'Active' })
           .populate('doctorId', 'firstName lastName email doctorId')
           .populate('patientId', 'firstName lastName email patientId')
           .sort({ issuedDate: -1 });
@@ -101,7 +101,10 @@ router.get('/patient/:patientId', async (req, res) => {
     }
 
     if (!prescriptions.length) {
-      return res.status(404).json({ message: 'No prescriptions found for this patient' });
+      return res.json({
+        message: 'No prescriptions found for this patient',
+        prescriptions: [],
+      });
     }
 
     res.json({

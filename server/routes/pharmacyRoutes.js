@@ -12,7 +12,7 @@ const generatePharmacyId = () => {
 // Register Pharmacy
 router.post('/register', async (req, res) => {
   try {
-    const { pharmacyName, managerName, email, password, phoneNumber, licenseNumber, address } = req.body;
+    const { pharmacyName, managerName, email, password, phoneNumber, licenseNumber, address, latitude, longitude } = req.body;
 
     if (!pharmacyName || !managerName || !email || !password) {
       return res.status(400).json({ message: 'Please provide required fields' });
@@ -35,6 +35,8 @@ router.post('/register', async (req, res) => {
       phoneNumber,
       licenseNumber,
       address,
+      latitude: latitude ? parseFloat(latitude) : null,
+      longitude: longitude ? parseFloat(longitude) : null,
     });
 
     await pharmacy.save();
@@ -129,6 +131,22 @@ router.post('/admin-login', async (req, res) => {
     res.status(401).json({ message: 'Invalid admin credentials' });
   } catch (error) {
     res.status(500).json({ message: 'Error', error: error.message });
+  }
+});
+
+// Get all pharmacies (for pharmacy locator)
+router.get('/', async (req, res) => {
+  try {
+    const pharmacies = await Pharmacy.find()
+      .select('-password') // Exclude password field
+      .sort({ pharmacyName: 1 }); // Sort by pharmacy name
+
+    res.json({
+      message: 'Pharmacies retrieved successfully',
+      pharmacies,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching pharmacies', error: error.message });
   }
 });
 

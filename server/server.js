@@ -15,13 +15,34 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => {
-    console.error('MongoDB connection error:', err.message);
-    process.exit(1);
-  });
+const PRIMARY_MONGO_URI = process.env.MONGODB_URI;
+const FALLBACK_MONGO_URI = process.env.MONGODB_URI_FALLBACK || 'mongodb://127.0.0.1:27017/medicus';
+
+const connectToMongo = async () => {
+  try {
+    await mongoose.connect(PRIMARY_MONGO_URI, {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
+    console.log('MongoDB connected successfully (Atlas)');
+  } catch (primaryError) {
+    console.error('Atlas connection failed, trying local fallback...');
+    console.error('Atlas error:', primaryError.message);
+
+    try {
+      await mongoose.connect(FALLBACK_MONGO_URI, {
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
+      });
+      console.log(`MongoDB connected successfully (fallback): ${FALLBACK_MONGO_URI}`);
+    } catch (fallbackError) {
+      console.error('Fallback MongoDB connection failed:', fallbackError.message);
+      console.error('Server will continue running, but database operations may fail until MongoDB is reachable.');
+    }
+  }
+};
+
+connectToMongo();
 
 // Routes
 app.use('/api/doctors', doctorRoutes);
@@ -32,7 +53,10 @@ app.use('/api/inventory', inventoryRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ message: 'Server running' });
+  res.json({
+    message: 'Server running',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+  });
 });
 
 const PORT = process.env.PORT || 5000;
