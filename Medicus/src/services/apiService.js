@@ -31,11 +31,16 @@ const callApi = async (path, options = {}) => {
     finalHeaders.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    method,
-    headers: finalHeaders,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      method,
+      headers: finalHeaders,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+  } catch (error) {
+    throw new Error('Unable to reach API server. Check REACT_APP_API_URL and backend CORS_ORIGIN settings.');
+  }
 
   const data = await parseApiJson(response);
   return { response, data };
