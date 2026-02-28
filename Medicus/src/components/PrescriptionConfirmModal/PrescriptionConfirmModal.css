@@ -1,0 +1,134 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.modal-content h2 {
+  margin: 0 0 20px 0;
+  font-size: 24px;
+  color: #2c3e50;
+}
+
+.modal-body {
+  margin-bottom: 20px;
+}
+
+.modal-error {
+  background-color: #fee;
+  color: #c33;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  border-left: 4px solid #c33;
+}
+
+.confirm-section {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.confirm-section h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  color: #34495e;
+}
+
+.confirm-section p {
+  margin: 5px 0;
+  color: #555;
+  font-size: 14px;
+}
+
+.prescription-note {
+  background: #d1fae5;
+  color: #059669;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border-left: 3px solid #059669;
+  margin: 10px 0 !important;
+}
+
+.confirm-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.confirm-section li {
+  padding: 10px;
+  background: #f8f9fa;
+  border-left: 3px solid #3498db;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+}
+
+.med-details-line {
+  color: #666;
+  font-size: 13px;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-cancel,
+.btn-confirm {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel:disabled,
+.btn-confirm:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-cancel {
+  background-color: #ecf0f1;
+  color: #2c3e50;
+}
+
+.btn-cancel:hover {
+  background-color: #bdc3c7;
+}
+
+.btn-confirm {
+  background-color: #92140c;
+  color: white;
+}
+
+.btn-confirm:hover {
+  background-color: #92140c;
+}

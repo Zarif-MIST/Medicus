@@ -1,0 +1,243 @@
+/* Doctor registration - aligned with patient/pharmacist design */
+
+.registration-page-wrapper {
+  min-height: 100vh;
+  padding: 60px 20px;
+  background-color: #fff5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.registration-main-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.registration-form-container {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  gap: 60px;
+  padding: 60px;
+}
+
+.registration-left-panel {
+  flex: 1;
+  background-color: #991b1b;
+  color: #fff;
+  border-radius: 24px;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.registration-icon {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 40px;
+}
+
+.registration-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.registration-heading {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 50px;
+  line-height: 1.4;
+}
+
+.registration-features-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  text-align: left;
+}
+
+.registration-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.feature-bullet {
+  margin-top: 2px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.registration-feature-item h3 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.registration-feature-item p {
+  margin: 0;
+  font-size: 16px;
+  opacity: 0.95;
+}
+
+.registration-right-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.registration-form {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.registration-error {
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #991b1b;
+  font-size: 14px;
+}
+
+.registration-input {
+  width: 100%;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border: 2px solid #ddd;
+  border-radius: 50px;
+  font-size: 16px;
+  background-color: #fafafa;
+  transition: border-color 0.3s;
+}
+
+.registration-input:focus {
+  outline: none;
+  border-color: #991b1b;
+}
+
+.registration-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 24px 0;
+}
+
+.registration-checkbox input {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  accent-color: #991b1b;
+}
+
+.registration-checkbox label {
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.registration-submit-btn {
+  width: 100%;
+  padding: 18px;
+  background-color: #991b1b;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s;
+}
+
+.registration-submit-btn:hover {
+  background-color: #7f1616;
+}
+
+.registration-submit-btn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.id-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  padding: 16px;
+}
+
+.id-modal {
+  width: min(460px, 100%);
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16);
+}
+
+.id-modal h3 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  color: #111827;
+}
+
+.id-modal p {
+  margin: 8px 0;
+  color: #374151;
+}
+
+.id-code {
+  margin: 14px 0;
+  padding: 14px;
+  border-radius: 10px;
+  background: #fff1f2;
+  color: #991b1b;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 1024px) {
+  .registration-form-container {
+    flex-direction: column;
+    padding: 40px;
+    gap: 40px;
+  }
+
+  .registration-left-panel {
+    padding: 50px 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .registration-form-container {
+    padding: 30px 20px;
+    border-radius: 16px;
+  }
+
+  .registration-heading {
+    font-size: 24px;
+  }
+
+  .registration-feature-item h3 {
+    font-size: 18px;
+  }
+
+  .registration-feature-item p {
+    font-size: 15px;
+  }
+}
