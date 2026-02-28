@@ -100,8 +100,9 @@ export default function PatientDashboard() {
   };
 
   const patientName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
-  const activePrescriptions = prescriptions.filter(rx => rx.status === 'Active');
-  const ongoingPrescriptions = activePrescriptions.filter(isOngoing);
+  const treatmentStatuses = new Set(['Active', 'Dispensed']);
+  const treatmentPrescriptions = prescriptions.filter((rx) => treatmentStatuses.has(rx.status));
+  const ongoingPrescriptions = treatmentPrescriptions.filter(isOngoing);
   const recentPrescriptionHistory = [...prescriptions]
     .sort((a, b) => new Date(b.issuedDate) - new Date(a.issuedDate))
     .slice(0, 2);

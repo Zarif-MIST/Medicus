@@ -1,6 +1,5 @@
-// In production set REACT_APP_API_URL to your deployed backend (e.g. https://your-backend.vercel.app/api)
-// In local development keep it empty to use CRA proxy via /api.
-const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
+// Use relative URLs so CRA proxy routes to backend at http://localhost:5001
+const API_BASE_URL = '/api';
 
 const parseApiJson = async (response) => {
   const contentType = response.headers.get('content-type') || '';
