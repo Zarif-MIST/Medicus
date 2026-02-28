@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { apiService } from '../../services/apiService';
 import './FavoritePharmacies.css';
 
@@ -9,13 +9,8 @@ export default function FavoritePharmacies({ patientId, onSelectPharmacy }) {
   const [ratingModal, setRatingModal] = useState(null);
   const [rating, setRating] = useState(0);
 
-  useEffect(() => {
-    if (patientId) {
-      fetchFavorites();
-    }
-  }, [patientId]);
-
-  const fetchFavorites = async () => {
+  const fetchFavorites = useCallback(async () => {
+    if (!patientId) return;
     try {
       setLoading(true);
       const response = await apiService.getFavoritePharmacies(patientId);
@@ -27,7 +22,11 @@ export default function FavoritePharmacies({ patientId, onSelectPharmacy }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [patientId]);
+
+  useEffect(() => {
+    fetchFavorites();
+  }, [fetchFavorites]);
 
   const handleRemoveFavorite = async (favoriteId) => {
     try {

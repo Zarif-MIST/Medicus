@@ -18,7 +18,6 @@ export default function PatientDashboard() {
   const [activeTab, setActiveTab] = useState('overview'); // added for tab management
   const [selectedPharmacy, setSelectedPharmacy] = useState(null); // added for pharmacy selection
   const [currentOrder, setCurrentOrder] = useState(null); // added for order tracking
-  const [currentPayment, setCurrentPayment] = useState(null); // added for payment tracking
 
   // Redirect if not authenticated as patient
   useEffect(() => {
@@ -114,8 +113,7 @@ export default function PatientDashboard() {
   };
 
   // Handle payment completion
-  const handlePaymentComplete = (payment) => {
-    setCurrentPayment(payment);
+  const handlePaymentComplete = () => {
     alert('Payment successful! Your order has been confirmed.');
     setActiveTab('overview');
     // Reset for next order
