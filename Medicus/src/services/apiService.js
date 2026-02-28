@@ -1,5 +1,4 @@
-// Use relative URLs so CRA proxy routes to backend at http://localhost:5001
-const API_BASE_URL = '/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
 const parseApiJson = async (response) => {
   const contentType = response.headers.get('content-type') || '';
@@ -10,7 +9,7 @@ const parseApiJson = async (response) => {
   }
 
   if (!contentType.includes('application/json')) {
-    throw new Error('API is unreachable or misconfigured. Please ensure backend is running and proxy is correct.');
+    throw new Error('API is unreachable or misconfigured. Please ensure backend is deployed and REACT_APP_API_URL is correct.');
   }
 
   try {
@@ -20,461 +19,267 @@ const parseApiJson = async (response) => {
   }
 };
 
+const callApi = async (path, options = {}) => {
+  const { method = 'GET', body, headers = {}, token } = options;
+
+  const finalHeaders = {
+    'Content-Type': 'application/json',
+    ...headers,
+  };
+
+  if (token) {
+    finalHeaders.Authorization = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method,
+    headers: finalHeaders,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+
+  const data = await parseApiJson(response);
+  return { response, data };
+};
+
 export const apiService = {
-  // Doctor APIs
   doctorRegister: async (doctorData) => {
-    const response = await fetch(`${API_BASE_URL}/doctors/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(doctorData),
-    });
-    return response.json();
-  },
-
-  doctorLogin: async (identifier, password) => {
-    const response = await fetch(`${API_BASE_URL}/doctors/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identifier, password }),
-    });
-    return response.json();
-  },
-
-  doctorAdminLogin: async () => {
-    const response = await fetch(`${API_BASE_URL}/doctors/admin-login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: 'admin', password: 'admin' }),
-    });
-    return response.json();
-  },
-
-  // Patient APIs
-  patientRegister: async (patientData) => {
-    const response = await fetch(`${API_BASE_URL}/patients/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(patientData),
-    });
-    return response.json();
-  },
-
-  patientLogin: async (identifier, password) => {
-    const response = await fetch(`${API_BASE_URL}/patients/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identifier, password }),
-    });
-    return response.json();
-  },
-
-  patientAdminLogin: async () => {
-    const response = await fetch(`${API_BASE_URL}/patients/admin-login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: 'admin', password: 'admin' }),
-    });
-    return response.json();
-  },
-
-  // Pharmacy APIs
-  pharmacyRegister: async (pharmacyData) => {
-    const response = await fetch(`${API_BASE_URL}/pharmacies/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(pharmacyData),
-    });
-    return response.json();
-  },
-
-  pharmacyLogin: async (identifier, password) => {
-    const response = await fetch(`${API_BASE_URL}/pharmacies/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identifier, password }),
-    });
-    return response.json();
-  },
-
-  pharmacyAdminLogin: async () => {
-    const response = await fetch(`${API_BASE_URL}/pharmacies/admin-login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: 'admin', password: 'admin' }),
-    });
-    return response.json();
-  },
-
-  // Patient lookup (for doctors)
-  getPatientById: async (patientId) => {
-    const response = await fetch(`${API_BASE_URL}/patients/${patientId}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await parseApiJson(response);
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to fetch patient');
-    }
+    const { data } = await callApi('/doctors/register', { method: 'POST', body: doctorData });
     return data;
   },
 
-  // Prescription APIs
+  doctorLogin: async (identifier, password) => {
+    const { data } = await callApi('/doctors/login', { method: 'POST', body: { identifier, password } });
+    return data;
+  },
+
+  doctorAdminLogin: async () => {
+    const { data } = await callApi('/doctors/admin-login', { method: 'POST', body: { username: 'admin', password: 'admin' } });
+    return data;
+  },
+
+  patientRegister: async (patientData) => {
+    const { data } = await callApi('/patients/register', { method: 'POST', body: patientData });
+    return data;
+  },
+
+  patientLogin: async (identifier, password) => {
+    const { data } = await callApi('/patients/login', { method: 'POST', body: { identifier, password } });
+    return data;
+  },
+
+  patientAdminLogin: async () => {
+    const { data } = await callApi('/patients/admin-login', { method: 'POST', body: { username: 'admin', password: 'admin' } });
+    return data;
+  },
+
+  pharmacyRegister: async (pharmacyData) => {
+    const { data } = await callApi('/pharmacies/register', { method: 'POST', body: pharmacyData });
+    return data;
+  },
+
+  pharmacyLogin: async (identifier, password) => {
+    const { data } = await callApi('/pharmacies/login', { method: 'POST', body: { identifier, password } });
+    return data;
+  },
+
+  pharmacyAdminLogin: async () => {
+    const { data } = await callApi('/pharmacies/admin-login', { method: 'POST', body: { username: 'admin', password: 'admin' } });
+    return data;
+  },
+
+  getPatientById: async (patientId) => {
+    const { response, data } = await callApi(`/patients/${patientId}`);
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch patient');
+    return data;
+  },
+
   createPrescription: async (prescriptionData) => {
-    const response = await fetch(`${API_BASE_URL}/prescriptions/create`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(prescriptionData),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to create prescription');
-    }
+    const { response, data } = await callApi('/prescriptions/create', { method: 'POST', body: prescriptionData });
+    if (!response.ok) throw new Error(data.message || 'Failed to create prescription');
     return data;
   },
 
   getPrescriptionsByPatient: async (patientId, options = {}) => {
     const params = new URLSearchParams();
-    if (options.forPharmacy) {
-      params.set('forPharmacy', 'true');
-    }
+    if (options.forPharmacy) params.set('forPharmacy', 'true');
     const query = params.toString() ? `?${params.toString()}` : '';
 
-    const response = await fetch(`${API_BASE_URL}/prescriptions/patient/${patientId}${query}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await parseApiJson(response);
+    const { response, data } = await callApi(`/prescriptions/patient/${patientId}${query}`);
     if (response.status === 404) {
       return { message: data.message || 'No prescriptions found for this patient', prescriptions: [] };
     }
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to fetch prescriptions');
-    }
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch prescriptions');
     return data;
   },
 
   getPrescriptionById: async (prescriptionId) => {
-    const response = await fetch(`${API_BASE_URL}/prescriptions/${prescriptionId}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    return response.json();
+    const { response, data } = await callApi(`/prescriptions/${prescriptionId}`);
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch prescription');
+    return data;
   },
 
   getDoctorPrescriptionHistory: async (doctorId, patientId = '') => {
     const params = new URLSearchParams();
-    if (patientId) {
-      params.set('patientId', patientId);
-    }
+    if (patientId) params.set('patientId', patientId);
     const query = params.toString() ? `?${params.toString()}` : '';
 
-    const response = await fetch(`${API_BASE_URL}/prescriptions/doctor/${doctorId}/history${query}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await parseApiJson(response);
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to fetch doctor prescription history');
-    }
+    const { response, data } = await callApi(`/prescriptions/doctor/${doctorId}/history${query}`);
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch doctor prescription history');
     return data;
   },
 
   updatePrescriptionStatus: async (prescriptionId, status) => {
-    const response = await fetch(`${API_BASE_URL}/prescriptions/${prescriptionId}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to update prescription status');
-    }
+    const { response, data } = await callApi(`/prescriptions/${prescriptionId}/status`, { method: 'PATCH', body: { status } });
+    if (!response.ok) throw new Error(data.message || 'Failed to update prescription status');
     return data;
   },
 
   markPrescriptionDispensedByPharmacy: async (prescriptionId) => {
-    const response = await fetch(`${API_BASE_URL}/prescriptions/${prescriptionId}/pharmacy-dispensed`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to mark prescription as dispensed');
-    }
+    const { response, data } = await callApi(`/prescriptions/${prescriptionId}/pharmacy-dispensed`, { method: 'PATCH' });
+    if (!response.ok) throw new Error(data.message || 'Failed to mark prescription as dispensed');
     return data;
   },
 
   dispensePrescriptionMedicine: async (prescriptionId, medicineIndex, pharmacyId) => {
-    const response = await fetch(`${API_BASE_URL}/prescriptions/${prescriptionId}/dispense-medicine`, {
+    const { response, data } = await callApi(`/prescriptions/${prescriptionId}/dispense-medicine`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ medicineIndex, pharmacyId }),
+      body: { medicineIndex, pharmacyId },
     });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to mark medicine as dispensed');
-    }
+    if (!response.ok) throw new Error(data.message || 'Failed to mark medicine as dispensed');
     return data;
   },
 
-  // Inventory APIs
   updateMedicineQuantity: async (medicineId, quantity, action) => {
-    const response = await fetch(`${API_BASE_URL}/inventory/${medicineId}/quantity`, {
+    const { response, data } = await callApi(`/inventory/${medicineId}/quantity`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ quantity, action }),
+      body: { quantity, action },
     });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to update medicine quantity');
-    }
+    if (!response.ok) throw new Error(data.message || 'Failed to update medicine quantity');
     return data;
   },
 
   addMedicineToInventory: async (medicineData) => {
     const token = localStorage.getItem('medicus_token');
-    const response = await fetch(`${API_BASE_URL}/inventory/add`, {
+    const { response, data } = await callApi('/inventory/add', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(medicineData),
+      body: medicineData,
+      token,
     });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to add medicine to inventory');
-    }
+    if (!response.ok) throw new Error(data.message || 'Failed to add medicine to inventory');
     return data;
   },
 
   getPharmacyInventory: async (pharmacyId) => {
-    const response = await fetch(`${API_BASE_URL}/inventory/pharmacy/${pharmacyId}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    return response.json();
-  },
-
-  searchMedicine: async (medicineName) => {
-    const response = await fetch(`${API_BASE_URL}/inventory/search/${medicineName}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    return response.json();
-  },
-
-  // Get all pharmacies (for pharmacy locator)
-  getAllPharmacies: async () => {
-    const response = await fetch(`${API_BASE_URL}/pharmacies`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to fetch pharmacies');
-    }
+    const { response, data } = await callApi(`/inventory/pharmacy/${pharmacyId}`);
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch pharmacy inventory');
     return data;
   },
 
-  // Favorite Pharmacy APIs
+  searchMedicine: async (medicineName) => {
+    const { response, data } = await callApi(`/inventory/search/${medicineName}`);
+    if (!response.ok) throw new Error(data.message || 'Failed to search medicine');
+    return data;
+  },
+
+  getAllPharmacies: async () => {
+    const { response, data } = await callApi('/pharmacies');
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch pharmacies');
+    return data;
+  },
+
   addFavoritePharmacy: async (patientId, pharmacyId) => {
-    const response = await fetch(`${API_BASE_URL}/favorites/add`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ patientId, pharmacyId }),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to add favorite pharmacy');
-    }
+    const { response, data } = await callApi('/favorites/add', { method: 'POST', body: { patientId, pharmacyId } });
+    if (!response.ok) throw new Error(data.message || 'Failed to add favorite pharmacy');
     return data;
   },
 
   removeFavoritePharmacy: async (favoriteId) => {
-    const response = await fetch(`${API_BASE_URL}/favorites/${favoriteId}`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to remove favorite pharmacy');
-    }
+    const { response, data } = await callApi(`/favorites/${favoriteId}`, { method: 'DELETE' });
+    if (!response.ok) throw new Error(data.message || 'Failed to remove favorite pharmacy');
     return data;
   },
 
   getFavoritePharmacies: async (patientId) => {
-    const response = await fetch(`${API_BASE_URL}/favorites/patient/${patientId}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to fetch favorite pharmacies');
-    }
+    const { response, data } = await callApi(`/favorites/patient/${patientId}`);
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch favorite pharmacies');
     return data;
   },
 
   checkFavoritePharmacy: async (patientId, pharmacyId) => {
-    const response = await fetch(`${API_BASE_URL}/favorites/check/${patientId}/${pharmacyId}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to check favorite');
-    }
+    const { response, data } = await callApi(`/favorites/check/${patientId}/${pharmacyId}`);
+    if (!response.ok) throw new Error(data.message || 'Failed to check favorite');
     return data;
   },
 
   ratePharmacy: async (favoriteId, rating) => {
-    const response = await fetch(`${API_BASE_URL}/favorites/${favoriteId}/rate`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rating }),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to rate pharmacy');
-    }
+    const { response, data } = await callApi(`/favorites/${favoriteId}/rate`, { method: 'PATCH', body: { rating } });
+    if (!response.ok) throw new Error(data.message || 'Failed to rate pharmacy');
     return data;
   },
 
-  // Medicine Order APIs
   createMedicineOrder: async (orderData) => {
-    const response = await fetch(`${API_BASE_URL}/orders/create`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(orderData),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to create order');
-    }
+    const { response, data } = await callApi('/orders/create', { method: 'POST', body: orderData });
+    if (!response.ok) throw new Error(data.message || 'Failed to create order');
     return data;
   },
 
   getPatientOrders: async (patientId) => {
-    const response = await fetch(`${API_BASE_URL}/orders/patient/${patientId}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to fetch orders');
-    }
+    const { response, data } = await callApi(`/orders/patient/${patientId}`);
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch orders');
     return data;
   },
 
   getPharmacyOrders: async (pharmacyId) => {
-    const response = await fetch(`${API_BASE_URL}/orders/pharmacy/${pharmacyId}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to fetch orders');
-    }
+    const { response, data } = await callApi(`/orders/pharmacy/${pharmacyId}`);
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch orders');
     return data;
   },
 
   getOrderById: async (orderId) => {
-    const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to fetch order');
-    }
+    const { response, data } = await callApi(`/orders/${orderId}`);
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch order');
     return data;
   },
 
   updateOrderStatus: async (orderId, status) => {
-    const response = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to update order status');
-    }
+    const { response, data } = await callApi(`/orders/${orderId}/status`, { method: 'PATCH', body: { status } });
+    if (!response.ok) throw new Error(data.message || 'Failed to update order status');
     return data;
   },
 
   cancelOrder: async (orderId) => {
-    const response = await fetch(`${API_BASE_URL}/orders/${orderId}/cancel`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to cancel order');
-    }
+    const { response, data } = await callApi(`/orders/${orderId}/cancel`, { method: 'PATCH' });
+    if (!response.ok) throw new Error(data.message || 'Failed to cancel order');
     return data;
   },
 
-  // Payment APIs
   initiatePayment: async (paymentData) => {
-    const response = await fetch(`${API_BASE_URL}/payments/initiate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(paymentData),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to initiate payment');
-    }
+    const { response, data } = await callApi('/payments/initiate', { method: 'POST', body: paymentData });
+    if (!response.ok) throw new Error(data.message || 'Failed to initiate payment');
     return data;
   },
 
   getPaymentById: async (paymentId) => {
-    const response = await fetch(`${API_BASE_URL}/payments/${paymentId}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to fetch payment');
-    }
+    const { response, data } = await callApi(`/payments/${paymentId}`);
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch payment');
     return data;
   },
 
   getPaymentsByOrder: async (orderId) => {
-    const response = await fetch(`${API_BASE_URL}/payments/order/${orderId}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to fetch payments');
-    }
+    const { response, data } = await callApi(`/payments/order/${orderId}`);
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch payments');
     return data;
   },
 
   getPaymentsByPatient: async (patientId) => {
-    const response = await fetch(`${API_BASE_URL}/payments/patient/${patientId}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to fetch payments');
-    }
+    const { response, data } = await callApi(`/payments/patient/${patientId}`);
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch payments');
     return data;
   },
 
   refundPayment: async (paymentId) => {
-    const response = await fetch(`${API_BASE_URL}/payments/${paymentId}/refund`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to refund payment');
-    }
+    const { response, data } = await callApi(`/payments/${paymentId}/refund`, { method: 'POST' });
+    if (!response.ok) throw new Error(data.message || 'Failed to refund payment');
     return data;
   },
 };
-
