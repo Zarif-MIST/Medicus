@@ -92,6 +92,31 @@ const connectToMongo = async () => {
 
 connectToMongo();
 
+const getMongoUriMeta = () => {
+  if (!PRIMARY_MONGO_URI) {
+    return { configured: false, scheme: null, clusterHost: null, hasDatabaseName: false };
+  }
+
+  const scheme = PRIMARY_MONGO_URI.startsWith('mongodb+srv://')
+    ? 'mongodb+srv'
+    : PRIMARY_MONGO_URI.startsWith('mongodb://')
+      ? 'mongodb'
+      : 'unknown';
+
+  const hostMatch = PRIMARY_MONGO_URI.match(/@([^/?]+)/);
+  const clusterHost = hostMatch ? hostMatch[1] : null;
+  const afterHost = PRIMARY_MONGO_URI.split(clusterHost || '')[1] || '';
+  const pathPart = afterHost.split('?')[0] || '';
+  const hasDatabaseName = /^\/[A-Za-z0-9_-]+/.test(pathPart);
+
+  return {
+    configured: true,
+    scheme,
+    clusterHost,
+    hasDatabaseName,
+  };
+};
+
 // Routes
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/patients', patientRoutes);
@@ -109,6 +134,7 @@ app.get('/api/health', (req, res) => {
     message: 'Server running',
     database: isConnected ? 'connected' : 'disconnected',
     mongoError: isConnected ? null : lastMongoError,
+    mongoUri: getMongoUriMeta(),
   });
 });
 
