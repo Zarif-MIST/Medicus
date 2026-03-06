@@ -1,25 +1,44 @@
+<<<<<<< HEAD
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.env
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+=======
 .DS_Store
 
 # Dependencies
 node_modules/
 **/node_modules/
-/.pnp
-.pnp.js
 
 # Environment files
 .env
 **/.env
 .env.*
 **/.env.*
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 
 # Build artifacts
 build/
 dist/
-/coverage
 
 # Logs
 npm-debug.log*
@@ -33,3 +52,4 @@ yarn-error.log*
 server/dump/
 *.bson
 *.metadata.json
+>>>>>>> 298ff2e (Fix: Remove git merge conflict markers from PharmDashInventory.jsx)

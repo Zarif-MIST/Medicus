@@ -1,4 +1,9 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
+const configuredApiUrl = (process.env.REACT_APP_API_URL || '').trim();
+const API_BASE_URL = configuredApiUrl
+  ? configuredApiUrl
+      .replace(/^https?:\/\/https?:\/\//i, 'https://')
+      .replace(/\/+$/, '')
+  : '/api';
 
 const parseApiJson = async (response) => {
   const contentType = response.headers.get('content-type') || '';

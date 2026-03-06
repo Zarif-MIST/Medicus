@@ -25,7 +25,16 @@ const allowedOrigins = (process.env.CORS_ORIGIN || '')
 app.use(cors({
   origin(origin, callback) {
     const normalizedRequestOrigin = normalizeOrigin(origin || '');
-    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(normalizedRequestOrigin)) {
+    const isVercelFrontend = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(normalizedRequestOrigin);
+    const isLocalhost = /^https?:\/\/localhost(:\d+)?$/i.test(normalizedRequestOrigin);
+
+    if (
+      !origin ||
+      allowedOrigins.length === 0 ||
+      allowedOrigins.includes(normalizedRequestOrigin) ||
+      isVercelFrontend ||
+      isLocalhost
+    ) {
       callback(null, true);
       return;
     }
@@ -39,6 +48,14 @@ const FALLBACK_MONGO_URI = process.env.MONGODB_URI_FALLBACK || 'mongodb://127.0.
 const isVercel = process.env.VERCEL === '1';
 let mongoConnectionPromise = null;
 let lastMongoError = null;
+
+mongoose.connection.on('connected', () => {
+  lastMongoError = null;
+});
+
+mongoose.connection.on('error', (error) => {
+  lastMongoError = error.message;
+});
 
 const connectToMongo = async () => {
   if (mongoose.connection.readyState === 1) {
@@ -128,12 +145,23 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
 
 // Health check
-app.get('/api/health', (req, res) => {
+app.get('/api/health', async (req, res) => {
+  if (mongoose.connection.readyState !== 1) {
+    try {
+      await Promise.race([
+        connectToMongo(),
+        new Promise((resolve) => setTimeout(resolve, 4000)),
+      ]);
+    } catch (error) {
+      lastMongoError = error.message;
+    }
+  }
+
   const isConnected = mongoose.connection.readyState === 1;
   res.json({
     message: 'Server running',
     database: isConnected ? 'connected' : 'disconnected',
-    mongoError: isConnected ? null : lastMongoError,
+    mongoError: isConnected ? null : (lastMongoError || 'MongoDB is still connecting or blocked by Atlas network access.'),
     mongoUri: getMongoUriMeta(),
   });
 });
